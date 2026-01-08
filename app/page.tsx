@@ -1,7 +1,12 @@
-const page = () => {
+import Navbar from "@/components/landing-page/Navbar"
+
+const Home = () => {
   return (
-    <div>page</div>
+    <div className="main-container">
+      {/* Navbar */}
+      <Navbar />
+    </div>
   )
 }
 
-export default page
+export default Home

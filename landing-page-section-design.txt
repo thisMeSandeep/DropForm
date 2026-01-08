@@ -1,0 +1,66 @@
+This file containes Landing page section wise design implementation .
+
+Product goal - A AI powered SAAS webapp ,that allow user to create forms like google forms but modern by just writing a prompt in natural language , Our AI will generate the form schema and we will render it . User can fully cutsmize the form and fields . View collected data in dashboard and query the data using our AI chat bot .
+- Product name - "DropForm"
+
+
+
+1) Landing page
+
+- Main color throughout the page - #030014
+
+2)Navbar 
+
+- Logo on the left - Simple text with text gradient 
+- Navlinks Links on the center  (Home , Demo , Features , Pricing , Contact)
+- Login and Start free trail button on the left
+
+
+
+1) Hero page 
+
+- Small pill with text - "Build forms using AI"
+- Main heading - "Drop forms within seconds"
+- Sub heading - "Build forms by just writing a prompt in human language"
+- A textarea with animated placholder(typing effect to demonstrate writing effect) with a "Get started" button
+
+
+2 ) form display section 
+
+- Main heading - "Build Modern forms within seconds"
+- Show forms image
+
+
+3) Demo Section 
+
+- Main heading - "Watch demo"
+- Video block 
+
+
+4)Dahbaord showcase
+
+- Main heading - "Manage your collected data seamlessly"
+- Subheading - "Query you data with our smart AI chat bot in natural language"
+- Image of the dashboard
+
+5) Features section 
+
+- Main heading - "Features that make us impressive"
+- Features - Bento grid - With graident background on hover 
+- 4 features 
+
+6) Pricing section 
+
+- Main heading - "Simple pricing for everyone."
+- Sub heading - "Choose an affordable plan according with the number of responses you want"
+- Three pricing card - 1) Free - 150 responses  2)149 - 1000 responses 3)249 - 3000 responses
+
+7 ) Contact Us section 
+
+
+8 ) Footer 
+
+
+
+
+

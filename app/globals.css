@@ -183,4 +183,9 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .main-container{
+    @apply bg-[#030014] min-h-screen ;
+  }
+
 }
