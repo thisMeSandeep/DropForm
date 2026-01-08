@@ -16,10 +16,10 @@ const Hero = () => {
                 </div>
 
                 {/* Main heading  */}
-                <h1 className="mb-8">
+                <h1 className="mb-4">
                     {/* Desktop */}
                     <div className="hidden md:block">
-                        <span className="section-header-title text-7xl font-bold leading-tight">
+                        <span className="section-header-title text-7xl font-semibold leading-tight">
                             Drop forms within seconds.
                         </span>
                     </div>
@@ -36,7 +36,7 @@ const Hero = () => {
                 </h1>
 
                 {/* Sub heading */}
-                <h3 className="text-2xl text-gray-100/40 ">Build forms by just writing a prompt in human language.</h3>
+                <h3 className="text-lg text-gray-100/40 ">Build forms by just writing a prompt in human language.</h3>
 
             </div>
 
