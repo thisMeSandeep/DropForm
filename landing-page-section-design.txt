@@ -55,7 +55,7 @@ Product goal - A AI powered SAAS webapp ,that allow user to create forms like go
 - Sub heading - "Choose an affordable plan according with the number of responses you want"
 - Three pricing card - 1) Free - 150 responses  2)149 - 1000 responses 3)249 - 3000 responses
 
-7 ) Contact Us section 
+7 ) Contact Us section  - Email , X and Linkedin 
 
 
 8 ) Footer 

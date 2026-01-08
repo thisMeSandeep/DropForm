@@ -1,6 +1,7 @@
 import { Check } from "lucide-react"
 import { Button } from "../ui/button"
 import { Particles } from "../ui/particles"
+import { BorderBeam } from "../ui/border-beam"
 
 const pricingPlans = [
     {
@@ -52,7 +53,7 @@ const pricingPlans = [
 
 const PricingSection = () => {
     return (
-        <section className="relative px-4 sm:px-6 md:px-8 pt-20 md:pt-32 pb-20">
+        <section className="relative px-4 sm:px-6 md:px-8 pt-20 md:pt-32 pb-20 overflow-hidden">
 
             {/* Particles */}
             <div className="absolute inset-0 overflow-hidden">
@@ -74,19 +75,28 @@ const PricingSection = () => {
 
                 {/* Pricing Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-                    {pricingPlans.map((plan) => (
-                        <div
-                            key={plan.name}
-                            className={`relative rounded-xl p-6 sm:p-8 flex flex-col ${plan.popular
+                    {pricingPlans.map((plan, index) => {
+                        // Different BorderBeam configurations for each card
+                        const beamConfigs = [
+                            { reverse: false, delay: 0, duration: 6 },      // Free - forward, no delay
+                            { reverse: true, delay: 2, duration: 6 },       // Pro - reverse, 2s delay
+                            { reverse: false, delay: 4, duration: 6 },      // Enterprise - forward, 4s delay
+                        ]
+                        const beamConfig = beamConfigs[index]
+
+                        return (
+                            <div
+                                key={plan.name}
+                                className={`relative rounded-xl p-6 sm:p-8 flex flex-col ${plan.popular
                                     ? "bg-[#0a0a1a] border-2 border-white/20 scale-105"
                                     : "bg-[#0a0a1a] border border-white/10"
-                                } transform-gpu transition-all duration-300 hover:scale-[1.02] hover:border-white/30`}
-                            style={{
-                                boxShadow: plan.popular
-                                    ? "0_0_0_1px_rgba(255,255,255,.1),0_4px_6px_rgba(0,0,0,.3),0_20px_25px_rgba(0,0,0,.2)"
-                                    : "0_0_0_1px_rgba(255,255,255,.05),0_2px_4px_rgba(0,0,0,.3),0_12px_24px_rgba(0,0,0,.2)",
-                            }}
-                        >
+                                    } transform-gpu transition-all duration-300 hover:scale-[1.02] hover:border-white/30`}
+                                style={{
+                                    boxShadow: plan.popular
+                                        ? "0_0_0_1px_rgba(255,255,255,.1),0_4px_6px_rgba(0,0,0,.3),0_20px_25px_rgba(0,0,0,.2)"
+                                        : "0_0_0_1px_rgba(255,255,255,.05),0_2px_4px_rgba(0,0,0,.3),0_12px_24px_rgba(0,0,0,.2)",
+                                }}
+                            >
                             {/* Popular badge */}
                             {plan.popular && (
                                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -116,8 +126,8 @@ const PricingSection = () => {
 
                             {/* Features list */}
                             <ul className="flex-1 space-y-3 mb-6">
-                                {plan.features.map((feature, index) => (
-                                    <li key={index} className="flex items-start gap-3">
+                                {plan.features.map((feature, featureIndex) => (
+                                    <li key={featureIndex} className="flex items-start gap-3">
                                         <Check className="h-5 w-5 text-white/90 shrink-0 mt-0.5" />
                                         <span className="text-sm text-gray-300/70">{feature}</span>
                                     </li>
@@ -127,15 +137,25 @@ const PricingSection = () => {
                             {/* CTA Button */}
                             <Button
                                 className={`w-full ${plan.popular
-                                        ? "bg-linear-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
-                                        : "bg-[#030014] border border-white/20 text-white/90 hover:bg-white/5 hover:border-white/30"
+                                    ? "bg-linear-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
+                                    : "bg-[#030014] border border-white/20 text-white/90 hover:bg-white/5 hover:border-white/30"
                                     }`}
                                 variant={plan.popular ? "default" : "outline"}
                             >
                                 {plan.cta}
                             </Button>
-                        </div>
-                    ))}
+                                <BorderBeam
+                                    duration={beamConfig.duration}
+                                    delay={beamConfig.delay}
+                                    reverse={beamConfig.reverse}
+                                    size={400}
+                                    borderWidth={2}
+                                    colorFrom="rgba(229, 156, 255, 0.8)"
+                                    colorTo="rgba(156, 178, 255, 0.8)"
+                                />
+                            </div>
+                        )
+                    })}
                 </div>
             </div>
         </section>
