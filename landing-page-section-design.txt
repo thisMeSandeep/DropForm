@@ -19,7 +19,7 @@ Product goal - A AI powered SAAS webapp ,that allow user to create forms like go
 
 1) Hero page 
 
-- Small pill with text - "Build forms using AI"
+- badge with text - "Build forms using AI"
 - Main heading - "Drop forms within seconds"
 - Sub heading - "Build forms by just writing a prompt in human language"
 - A textarea with animated placholder(typing effect to demonstrate writing effect) with a "Get started" button

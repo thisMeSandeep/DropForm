@@ -1,3 +1,4 @@
+import Hero from "@/components/landing-page/Hero"
 import Navbar from "@/components/landing-page/Navbar"
 
 const Home = () => {
@@ -5,6 +6,7 @@ const Home = () => {
     <div className="main-container">
       {/* Navbar */}
       <Navbar />
+      <Hero />
     </div>
   )
 }
