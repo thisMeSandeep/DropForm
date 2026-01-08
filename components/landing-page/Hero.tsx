@@ -3,9 +3,9 @@ import AnimatedTextArea from "./AnimatedTextArea"
 
 const Hero = () => {
     return (
-        <div className="pt-32 pb-20 px-4 sm:px-6 md:px-8">
+        <section className="pt-32 pb-32 md:pb-40 px-4 sm:px-6 md:px-8 flex flex-col items-center justify-center min-h-screen">
             {/* Text content */}
-            <div className="max-w-5xl mx-auto text-center">
+            <div className="max-w-5xl mx-auto text-center w-full">
 
                 {/* Hero badge */}
                 <div className="flex justify-center mb-2">
@@ -41,9 +41,11 @@ const Hero = () => {
             </div>
 
             {/* Animted text area  */}
-            <AnimatedTextArea />
+            <div className="w-full mt-8">
+                <AnimatedTextArea />
+            </div>
 
-        </div>
+        </section>
     )
 }
 

@@ -31,12 +31,11 @@ const Navbar = () => {
     }
 
     return (
-        <div 
-            className={`text-white/90 px-4 sm:px-6 md:px-10 py-4 fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-                isScrolled 
-                    ? "bg-black/20 backdrop-blur-md border-b border-b-gray-100/30 shadow-lg" 
-                    : "bg-transparent"
-            }`}
+        <div
+            className={`text-white/90 px-4 sm:px-6 md:px-10 py-4 fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+                ? "bg-black/20 backdrop-blur-md border-b border-b-gray-100/30 shadow-lg"
+                : "md:bg-transparent bg-black/20 backdrop-blur-md"
+                }`}
         >
             <nav className="flex items-center justify-between max-w-7xl mx-auto">
                 {/* Logo  - With text gradient*/}
@@ -48,9 +47,9 @@ const Navbar = () => {
                 <ul className="hidden md:flex items-center space-x-10 border border-gray-100/20 px-5 py-2.5 rounded-4xl">
                     {
                         navlinks.map((link) => (
-                            <Link 
-                                key={link.link} 
-                                href={link.path} 
+                            <Link
+                                key={link.link}
+                                href={link.path}
                                 className="hover:text-gray-100/40 transition-colors duration-300"
                             >
                                 {link.link}
@@ -108,7 +107,7 @@ const Navbar = () => {
                             >
                                 Login
                             </Link>
-                            <button 
+                            <button
                                 onClick={closeMobileMenu}
                                 className="relative px-5 py-2 rounded-4xl border border-gray-100/20 hover:scale-105 transition-all duration-500 cursor-pointer w-fit"
                             >
