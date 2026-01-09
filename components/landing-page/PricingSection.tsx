@@ -2,6 +2,7 @@ import { Check } from "lucide-react"
 import { Button } from "../ui/button"
 import { Particles } from "../ui/particles"
 import { BorderBeam } from "../ui/border-beam"
+import { GridPattern, genRandomPattern } from "../ui/grid-feature-cards"
 
 const pricingPlans = [
     {
@@ -83,11 +84,12 @@ const PricingSection = () => {
                             { reverse: false, delay: 4, duration: 6 },      // Enterprise - forward, 4s delay
                         ]
                         const beamConfig = beamConfigs[index]
+                        const pattern = genRandomPattern()
 
                         return (
                             <div
                                 key={plan.name}
-                                className={`relative rounded-xl p-6 sm:p-8 flex flex-col ${plan.popular
+                                className={`relative rounded-xl p-6 sm:p-8 flex flex-col overflow-hidden ${plan.popular
                                     ? "bg-[#0a0a1a] border-2 border-white/20 scale-105"
                                     : "bg-[#0a0a1a] border border-white/10"
                                     } transform-gpu transition-all duration-300 hover:scale-[1.02] hover:border-white/30`}
@@ -97,53 +99,69 @@ const PricingSection = () => {
                                         : "0_0_0_1px_rgba(255,255,255,.05),0_2px_4px_rgba(0,0,0,.3),0_12px_24px_rgba(0,0,0,.2)",
                                 }}
                             >
-                            {/* Popular badge */}
-                            {plan.popular && (
-                                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                                    <span className="hero-badge-text bg-linear-to-r from-purple-500 to-pink-500 text-white px-4 py-1 rounded-full text-xs font-semibold">
-                                        Most Popular
-                                    </span>
+                                {/* Grid Pattern Background */}
+                                <div className="pointer-events-none absolute top-0 left-1/2 -mt-2 -ml-20 h-full w-full mask-[linear-gradient(white,transparent)] opacity-20">
+                                    <div className="absolute inset-0 bg-linear-to-r from-white/5 to-white/1 mask-[radial-gradient(farthest-side_at_top,white,transparent)]">
+                                        <GridPattern
+                                            width={20}
+                                            height={20}
+                                            x="-12"
+                                            y="4"
+                                            squares={pattern}
+                                            className="fill-white/5 stroke-white/10 absolute inset-0 h-full w-full mix-blend-overlay"
+                                        />
+                                    </div>
                                 </div>
-                            )}
 
-                            {/* Plan name */}
-                            <h3 className="text-xl font-semibold text-white/90 mb-2">
-                                {plan.name}
-                            </h3>
-
-                            {/* Price */}
-                            <div className="mb-4">
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-4xl font-bold text-white/90">
-                                        {plan.price}
-                                    </span>
-                                    {plan.price !== "$0" && (
-                                        <span className="text-sm text-gray-400">{plan.period}</span>
+                                <div className="relative z-10 flex flex-col h-full">
+                                    {/* Popular badge */}
+                                    {plan.popular && (
+                                        <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                                            <span className="hero-badge-text bg-linear-to-r from-purple-500 to-pink-500 text-white px-4 py-1 rounded-full text-xs font-semibold">
+                                                Most Popular
+                                            </span>
+                                        </div>
                                     )}
+
+                                    {/* Plan name */}
+                                    <h3 className="text-xl font-semibold text-white/90 mb-2">
+                                        {plan.name}
+                                    </h3>
+
+                                    {/* Price */}
+                                    <div className="mb-4">
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-4xl font-bold text-white/90">
+                                                {plan.price}
+                                            </span>
+                                            {plan.price !== "$0" && (
+                                                <span className="text-sm text-gray-400">{plan.period}</span>
+                                            )}
+                                        </div>
+                                        <p className="text-sm text-gray-300/70 mt-1">{plan.responses}</p>
+                                    </div>
+
+                                    {/* Features list */}
+                                    <ul className="flex-1 space-y-3 mb-6">
+                                        {plan.features.map((feature, featureIndex) => (
+                                            <li key={featureIndex} className="flex items-start gap-3">
+                                                <Check className="h-5 w-5 text-white/90 shrink-0 mt-0.5" />
+                                                <span className="text-sm text-gray-300/70">{feature}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    {/* CTA Button */}
+                                    <Button
+                                        className={`w-full ${plan.popular
+                                            ? "bg-linear-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
+                                            : "bg-[#030014] border border-white/20 text-white/90 hover:bg-white/5 hover:border-white/30"
+                                            }`}
+                                        variant={plan.popular ? "default" : "outline"}
+                                    >
+                                        {plan.cta}
+                                    </Button>
                                 </div>
-                                <p className="text-sm text-gray-300/70 mt-1">{plan.responses}</p>
-                            </div>
-
-                            {/* Features list */}
-                            <ul className="flex-1 space-y-3 mb-6">
-                                {plan.features.map((feature, featureIndex) => (
-                                    <li key={featureIndex} className="flex items-start gap-3">
-                                        <Check className="h-5 w-5 text-white/90 shrink-0 mt-0.5" />
-                                        <span className="text-sm text-gray-300/70">{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-
-                            {/* CTA Button */}
-                            <Button
-                                className={`w-full ${plan.popular
-                                    ? "bg-linear-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
-                                    : "bg-[#030014] border border-white/20 text-white/90 hover:bg-white/5 hover:border-white/30"
-                                    }`}
-                                variant={plan.popular ? "default" : "outline"}
-                            >
-                                {plan.cta}
-                            </Button>
                                 <BorderBeam
                                     duration={beamConfig.duration}
                                     delay={beamConfig.delay}
