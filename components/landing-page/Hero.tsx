@@ -7,19 +7,29 @@ const Hero = () => {
         <section className="relative pt-32 pb-32 md:pb-40 px-4 sm:px-6 md:px-8 flex flex-col items-center justify-center min-h-screen">
 
             {/* Corner gradient masks */}
-            {/* Corner gradient masks */}
-            <div className="absolute inset-0 pointer-events-none">
-                {/* Top left */}
-                <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-linear-to-br from-slate-800/15 via-slate-900/5 to-transparent blur-3xl"></div>
+            <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+                {/* Top left glow */}
+                <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.1)_0%,transparent_70%)] blur-[100px]" />
 
-                {/* Top right */}
-                <div className="absolute -top-32 -right-32 w-[600px] h-[600px] bg-linear-to-bl from-gray-800/15 via-gray-900/5 to-transparent blur-3xl"></div>
+                {/* Top right glow */}
+                <div className="absolute -top-[10%] -right-[10%] w-[40%] h-[40%] bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.1)_0%,transparent_70%)] blur-[100px]" />
 
-                {/* Bottom left */}
-                <div className="absolute -bottom-32 -left-32 w-[600px] h-[600px] bg-linear-to-tr from-zinc-800/12 via-zinc-900/4 to-transparent blur-3xl"></div>
+                {/* Bottom left glow */}
+                <div className="absolute -bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.06)_0%,transparent_70%)] blur-[100px]" />
 
-                {/* Bottom right */}
-                <div className="absolute -bottom-32 -right-32 w-[600px] h-[600px] bg-linear-to-tl from-neutral-800/12 via-neutral-900/4 to-transparent blur-3xl"></div>
+                {/* Bottom right glow */}
+                <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.06)_0%,transparent_70%)] blur-[100px]" />
+
+                {/* Grid Pattern */}
+                <div
+                    className="absolute inset-0 opacity-[0.2]"
+                    style={{
+                        backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px)`,
+                        backgroundSize: '40px 40px',
+                        maskImage: 'radial-gradient(ellipse at center, black 50%, transparent 100%)',
+                        WebkitMaskImage: 'radial-gradient(ellipse at center, black 50%, transparent 100%)',
+                    }}
+                />
             </div>
 
 
