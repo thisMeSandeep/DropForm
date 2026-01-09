@@ -1,0 +1,7 @@
+Run prisma migration - npx prisma migrate dev --name init
+
+
+Generate prisma client - npx prisma generate
+
+
+Open web db explorer - npx prisma studio --config ./prisma.config.ts
