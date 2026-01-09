@@ -6,7 +6,7 @@ import { Menu, X } from "lucide-react"
 import { BorderBeam } from "../ui/border-beam"
 
 const navlinks = [
-    { link: "Home", path: "/" },
+    { link: "Home", path: "/#home" },
     { link: "Demo", path: "/#demo" },
     { link: "Features", path: "/#features" },
     { link: "Pricing", path: "/#pricing" },

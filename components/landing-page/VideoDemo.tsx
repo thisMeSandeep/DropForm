@@ -3,7 +3,7 @@ import { LightRays } from "../ui/light-rays";
 
 const VideoDemo = () => {
     return (
-        <section className="relative px-4 sm:px-6 md:px-8 pt-20 md:pt-32 pb-20">
+        <section id="demo" className="relative px-4 sm:px-6 md:px-8 pt-20 md:pt-32 pb-20">
 
             {/* Light rays  */}
             <LightRays />

@@ -283,12 +283,3 @@
     background: rgba(255, 255, 255, 0.65);
   }
 }
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}

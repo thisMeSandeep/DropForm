@@ -54,7 +54,7 @@ const pricingPlans = [
 
 const PricingSection = () => {
     return (
-        <section className="relative px-4 sm:px-6 md:px-8 pt-20 md:pt-32 pb-20 overflow-hidden">
+        <section id="pricing" className="relative px-4 sm:px-6 md:px-8 pt-20 md:pt-32 pb-20 overflow-hidden">
 
             {/* Particles */}
             <div className="absolute inset-0 overflow-hidden">

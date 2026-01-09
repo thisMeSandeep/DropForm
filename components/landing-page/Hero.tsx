@@ -4,7 +4,7 @@ import AnimatedTextArea from "./AnimatedTextArea"
 
 const Hero = () => {
     return (
-        <section className="relative pt-32 pb-32 md:pb-40 px-4 sm:px-6 md:px-8 flex flex-col items-center justify-center min-h-screen">
+        <section id="home" className="relative pt-32 pb-32 md:pb-40 px-4 sm:px-6 md:px-8 flex flex-col items-center justify-center min-h-screen">
 
             {/* Corner gradient masks */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">

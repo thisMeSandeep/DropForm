@@ -40,7 +40,7 @@ const features: BentoItem[] = [
 
 const FeaturesSection = () => {
     return (
-        <section className="relative px-4 sm:px-6 md:px-8 pt-20 md:pt-32 pb-20">
+        <section id="features" className="relative px-4 sm:px-6 md:px-8 pt-20 md:pt-32 pb-20">
             <div className="max-w-7xl mx-auto">
                 {/* Header section */}
                 <div className="text-center mb-12">
