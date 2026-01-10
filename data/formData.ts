@@ -2,6 +2,7 @@ const forms = [
   {
     title: "Frontend Developer Job Application",
     description: "Apply for the frontend developer role",
+    brandLogo: "/sampleLogo.png",
     status: "published",
     fieldSchema: {
       version: 1,
@@ -55,9 +56,9 @@ const forms = [
       ],
     },
     designSchema: {
-      theme: "light",
       primaryColor: "#2563eb",
       backgroundColor: "#ffffff",
+      textColor: "#000000",
       fontFamily: "Inter",
       borderRadius: "md",
       spacing: "comfortable",
@@ -128,7 +129,6 @@ const forms = [
     },
 
     designSchema: {
-      theme: "dark",
       primaryColor: "#22c55e",
       backgroundColor: "#020617",
       fontFamily: "System",

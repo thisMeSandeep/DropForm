@@ -88,6 +88,7 @@ model Form {
   user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   title          String
   description    String?
+  brandLogo      String?
   fieldSchema    Json       @default("[]")
   designSchema   Json       @default("{}")
   status         String     @default("draft")
