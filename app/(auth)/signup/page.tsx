@@ -48,7 +48,7 @@ const Signup = () => {
                 name: data.name,
                 email: data.email,
                 password: data.password,
-                callbackURL: `/dashboard`,
+                callbackURL: `/forms`,
             })
 
             if (error) {
@@ -73,7 +73,7 @@ const Signup = () => {
             setErrorMessage(null)
             const { error } = await signIn.social({
                 provider,
-                callbackURL: "/dashboard",
+                callbackURL: "/forms",
             })
 
             if (error) {

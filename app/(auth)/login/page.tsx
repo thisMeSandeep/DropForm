@@ -66,7 +66,7 @@ const Login = () => {
         email: data.email,
         password: data.password,
         rememberMe: true,
-        callbackURL: `/dashboard`,
+        callbackURL: `/forms`,
       })
 
       if (error) {
@@ -92,7 +92,7 @@ const Login = () => {
       setErrorMessage(null)
       const { error } = await signIn.social({
         provider,
-        callbackURL: "/dashboard",
+        callbackURL: "/forms",
       })
 
       if (error) {

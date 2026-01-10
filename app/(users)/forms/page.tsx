@@ -2,16 +2,13 @@ import { auth } from "@/utils/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-const Dashboard = async () => {
-  // Get the session - this includes BOTH session info AND user data
+const Forms = async () => {
   let session;
   try {
     session = await auth.api.getSession({
-      headers: await headers() // you need to pass the headers object.
+      headers: await headers()
     })
   } catch (error) {
-    // If there's an error (e.g., invalid Base64 cookie), redirect to login
-    // The corrupted cookie will be handled by Better Auth on next login attempt
     console.error("Session error (likely corrupted cookie):", error);
     redirect("/login");
   }
@@ -40,4 +37,4 @@ const Dashboard = async () => {
   )
 }
 
-export default Dashboard
+export default Forms
