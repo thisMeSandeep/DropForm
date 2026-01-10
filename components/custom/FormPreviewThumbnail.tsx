@@ -1,99 +1,80 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Plus } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { FormRenderer, FormField, FormDesign } from "./FormRenderer";
+import { format } from "date-fns";
 
-interface FormThumbnailProps {
-    title: string;
-    description?: string;
-    brandLogo?: string;
-    logoAlignment?: 'left' | 'center' | 'right';
-    fieldSchema: { fields: FormField[] };
-    designSchema: FormDesign;
-    className?: string;
+interface FormPreviewCardProps {
+    form: {
+        title: string;
+        description?: string;
+        brandLogo?: string;
+        logoAlignment?: 'left' | 'center' | 'right';
+        fieldSchema: { fields: FormField[] };
+        designSchema: FormDesign;
+        createdAt?: string | Date;
+    };
+    onDelete?: () => void;
 }
 
-export const FormPreviewThumbnail = ({
-    title,
-    description,
-    brandLogo,
-    logoAlignment,
-    fieldSchema,
-    designSchema,
-    className
-}: FormThumbnailProps) => {
-    // Scaling logic: 1000px -> 200px (0.2 scale)
-    return (
-        <div className={cn(
-            "relative w-full aspect-4/3 bg-gray-50 border border-gray-200 rounded-lg overflow-hidden group hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-md",
-            className
-        )}>
-            {/* The Scaled Wrapper */}
-            <div
-                className="absolute top-0 left-0 origin-top-left pointer-events-none"
-                style={{
-                    transform: "scale(0.2)",
-                    width: "1000px",
-                }}
-            >
-                <FormRenderer
-                    title={title}
-                    description={description}
-                    brandLogo={brandLogo}
-                    logoAlignment={logoAlignment}
-                    fields={fieldSchema?.fields || []}
-                    design={designSchema}
-                    readOnly
-                />
-            </div>
+export const FormPreviewCard = ({ form, onDelete }: FormPreviewCardProps) => {
+    const creationDate = form.createdAt ? new Date(form.createdAt) : new Date();
 
-            {/* Interaction Overlay */}
-            <div className="absolute inset-0 bg-transparent group-hover:bg-black/5 transition-colors pointer-events-none" />
-        </div>
-    );
-};
-
-export const BlankFormCard = () => {
     return (
-        <div className="flex flex-col gap-3 group cursor-pointer w-full max-w-[220px]">
-            <div className="relative w-full aspect-4/3 bg-white border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center group-hover:border-primary group-hover:bg-primary/5 transition-all duration-300 overflow-hidden">
-                <Plus className="w-12 h-12 text-gray-400 group-hover:text-primary transition-colors" />
-            </div>
-            <span className="text-sm font-medium text-gray-700 px-1">Blank form</span>
-        </div>
-    );
-};
-
-export const FormCard = ({ form }: { form: any }) => {
-    return (
-        <div className="flex flex-col gap-3 group cursor-pointer w-full max-w-[220px]">
-            <FormPreviewThumbnail
-                title={form.title}
-                description={form.description}
-                brandLogo={form.brandLogo}
-                logoAlignment={form.logoAlignment}
-                fieldSchema={form.fieldSchema}
-                designSchema={form.designSchema}
-            />
-            <div className="flex flex-col px-1">
-                <span className="text-sm font-medium text-gray-900 truncate">{form.title}</span>
-                <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">Form</span>
-                    <span className="text-[10px] text-gray-400">Opened Oct 24</span>
+        <div className="flex flex-col gap-3 group w-full max-w-[280px]">
+            {/* Thumbnail Preview Area */}
+            <div className="relative w-full aspect-4/3 bg-gray-50 border border-zinc-200 rounded-xl overflow-hidden group-hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-md ring-1 ring-black/5">
+                {/* Minified Form Content */}
+                <div
+                    className="absolute top-0 left-0 origin-top-left pointer-events-none select-none"
+                    style={{
+                        transform: "scale(0.28)", // Adjusted scale for 280px width
+                        width: "1000px",
+                    }}
+                >
+                    <FormRenderer
+                        title={form.title}
+                        description={form.description}
+                        brandLogo={form.brandLogo}
+                        logoAlignment={form.logoAlignment}
+                        fields={form.fieldSchema?.fields || []}
+                        design={form.designSchema}
+                        readOnly
+                    />
                 </div>
-            </div>
-        </div>
-    );
-};
 
-export const FormPreviewGrid = ({ forms }: { forms: any[] }) => {
-    return (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8 p-8">
-            <BlankFormCard />
-            {forms.map((form, idx) => (
-                <FormCard key={idx} form={form} />
-            ))}
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-transparent group-hover:bg-black/2 transition-colors pointer-events-none" />
+            </div>
+
+            {/* Metadata and Actions */}
+            <div className="flex items-start justify-between px-1.5 mt-0.5">
+                <div className="flex flex-col gap-0.5 overflow-hidden">
+                    <h3 className="text-[14px] font-semibold text-zinc-900 truncate pr-2 leading-tight">
+                        {form.title}
+                    </h3>
+                    <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-tight">Form</span>
+                        <span className="w-1 h-1 rounded-full bg-zinc-300" />
+                        <span className="text-[11px] text-zinc-500 font-medium">
+                            {format(creationDate, "MMM d, yyyy")}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Quick Delete Action */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete?.();
+                    }}
+                    className="p-2 -mr-1 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 group/btn"
+                    title="Delete form"
+                >
+                    <Trash2 className="w-4 h-4 opacity-70 group-hover/btn:opacity-100" />
+                </button>
+            </div>
         </div>
     );
 };

@@ -1,8 +1,22 @@
-const forms = [
+import { FormField, FormDesign } from "@/components/custom/FormRenderer";
+
+export interface FormTemplate {
+  title: string;
+  description?: string;
+  brandLogo?: string;
+  logoAlignment?: "left" | "center" | "right";
+  status: "draft" | "published";
+  fieldSchema: {
+    version: number;
+    fields: FormField[];
+  };
+  designSchema: FormDesign;
+}
+
+export const templates: FormTemplate[] = [
   {
-    title: "Frontend Developer Job Application",
-    description: "Apply for the frontend developer role",
-    brandLogo: "/sampleLogo.png",
+    title: "Contact Information",
+    description: "A clean and simple way for customers to reach out to you.",
     status: "published",
     fieldSchema: {
       version: 1,
@@ -12,136 +26,235 @@ const forms = [
           type: "text",
           label: "Full Name",
           required: true,
-          validation: {
-            minLength: 2,
-            maxLength: 50,
-          },
+          placeholder: "Jane Smith",
         },
         {
           name: "email",
           type: "email",
           label: "Email Address",
           required: true,
+          placeholder: "jane@example.com",
         },
         {
-          name: "experience",
-          type: "number",
-          label: "Years of Experience",
-          required: true,
-          validation: {
-            min: 0,
-            max: 40,
-          },
-        },
-        {
-          name: "tech_stack",
-          type: "select",
-          label: "Primary Tech Stack",
-          required: true,
-          options: [
-            { label: "React", value: "react" },
-            { label: "Vue", value: "vue" },
-            { label: "Angular", value: "angular" },
-          ],
-        },
-        {
-          name: "portfolio_url",
+          name: "subject",
           type: "text",
-          label: "Portfolio Website",
+          label: "Subject",
           required: false,
-          validation: {
-            pattern: "https?://.+",
-          },
+          placeholder: "How can we help?",
+        },
+        {
+          name: "message",
+          type: "textarea",
+          label: "Message",
+          required: true,
+          placeholder: "Tell us more...",
         },
       ],
     },
     designSchema: {
       primaryColor: "#2563eb",
-      backgroundColor: "#ffffff",
-      textColor: "#000000",
-      fontFamily: "Inter",
+      backgroundColor: "#f8fafc",
+      formBackground: "#ffffff",
+      textColor: "#1e293b",
       borderRadius: "md",
-      spacing: "comfortable",
+      spacing: "normal",
       fieldStyles: {
         labelPosition: "top",
-        inputVariant: "outlined",
+        inputVariant: "outline",
       },
-      button: {
-        text: "Submit Application",
-        variant: "solid",
-      },
+      button: { text: "Send Message", variant: "default" },
     },
   },
   {
-    title: "Product Feedback Survey",
-    description: "Help us improve by sharing your feedback",
+    title: "Job Application",
+    description:
+      "Professional hiring form to collect candidate details and experience.",
+    status: "published",
+    fieldSchema: {
+      version: 1,
+      fields: [
+        { name: "name", type: "text", label: "Full Name", required: true },
+        { name: "email", type: "email", label: "Email", required: true },
+        {
+          name: "portfolio",
+          type: "text",
+          label: "Portfolio URL",
+          placeholder: "https://...",
+        },
+        {
+          name: "experience",
+          type: "textarea",
+          label: "Work Experience Summary",
+          required: true,
+        },
+        {
+          name: "role",
+          type: "select",
+          label: "Target Role",
+          options: [
+            { label: "Frontend Engineer", value: "frontend" },
+            { label: "Product Designer", value: "design" },
+            { label: "Product Manager", value: "pm" },
+          ],
+        },
+      ],
+    },
+    designSchema: {
+      primaryColor: "#4f46e5",
+      backgroundColor: "#ffffff",
+      formBackground: "#f9fafb",
+      textColor: "#111827",
+      borderRadius: "lg",
+      spacing: "relaxed",
+      fieldStyles: {
+        labelPosition: "top",
+        inputVariant: "outline",
+      },
+      button: { text: "Submit Application", variant: "default" },
+    },
+  },
+  {
+    title: "Event RSVP",
+    description:
+      "Manage guest lists for your upcoming corporate event or wedding.",
     status: "published",
     fieldSchema: {
       version: 1,
       fields: [
         {
-          name: "user_name",
+          name: "guest_name",
           type: "text",
-          label: "Your Name",
-          required: false,
+          label: "Guest Name",
+          required: true,
         },
         {
-          name: "rating",
+          name: "attending",
           type: "radio",
-          label: "How would you rate our product?",
+          label: "Will you be attending?",
           required: true,
           options: [
-            { label: "Excellent", value: "5" },
-            { label: "Good", value: "4" },
-            { label: "Average", value: "3" },
-            { label: "Poor", value: "2" },
-            { label: "Very Poor", value: "1" },
+            { label: "Yes, I'll be there!", value: "yes" },
+            { label: "Sorry, I can't make it", value: "no" },
           ],
         },
         {
-          name: "features_used",
-          type: "checkbox",
-          label: "Which features do you use?",
-          required: false,
-          options: [
-            { label: "Dashboard", value: "dashboard" },
-            { label: "Form Builder", value: "builder" },
-            { label: "AI Insights", value: "ai" },
-          ],
+          name: "dietary",
+          type: "text",
+          label: "Dietary Requirements",
+          placeholder: "e.g. Vegan, Nut-free",
         },
         {
-          name: "feedback",
-          type: "textarea",
-          label: "Your Feedback",
-          required: true,
-          validation: {
-            minLength: 10,
-            maxLength: 500,
-          },
-        },
-        {
-          name: "contact_email",
-          type: "email",
-          label: "Contact Email (optional)",
-          required: false,
+          name: "plus_one",
+          type: "number",
+          label: "Number of additional guests",
+          placeholder: "0",
         },
       ],
     },
-
     designSchema: {
-      primaryColor: "#22c55e",
-      backgroundColor: "#020617",
-      fontFamily: "System",
-      borderRadius: "lg",
-      spacing: "relaxed",
+      primaryColor: "#059669",
+      backgroundColor: "#ecfdf5",
+      formBackground: "#ffffff",
+      textColor: "#064e3b",
+      borderRadius: "full",
+      spacing: "comfortable" as any, // normal in renderer
       fieldStyles: {
         labelPosition: "top",
-        inputVariant: "filled",
+        inputVariant: "outline",
       },
-      button: {
-        text: "Send Feedback",
-        variant: "soft",
+      button: { text: "Send RSVP", variant: "secondary" },
+    },
+  } as any,
+  {
+    title: "Customer Feedback",
+    description: "Gather valuable insights to improve your product or service.",
+    status: "published",
+    fieldSchema: {
+      version: 1,
+      fields: [
+        {
+          name: "rating",
+          type: "radio",
+          label: "How satisfied are you?",
+          options: [
+            { label: "Very Satisfied", value: "5" },
+            { label: "Satisfied", value: "4" },
+            { label: "Neutral", value: "3" },
+            { label: "Unsatisfied", value: "2" },
+          ],
+        },
+        {
+          name: "favorite_feature",
+          type: "text",
+          label: "What is your favorite feature?",
+        },
+        {
+          name: "improvements",
+          type: "textarea",
+          label: "How can we improve?",
+          placeholder: "Your suggestions...",
+        },
+      ],
+    },
+    designSchema: {
+      primaryColor: "#ea580c",
+      backgroundColor: "#fff7ed",
+      formBackground: "#ffffff",
+      textColor: "#7c2d12",
+      borderRadius: "sm",
+      spacing: "relaxed",
+      fieldStyles: {
+        labelPosition: "left",
+        inputVariant: "underlined",
       },
+      button: { text: "Submit Feedback", variant: "outline" },
+    },
+  },
+  {
+    title: "Student Data Collection",
+    description: "Organized data gathering for university courses and clubs.",
+    status: "published",
+    fieldSchema: {
+      version: 1,
+      fields: [
+        {
+          name: "student_name",
+          type: "text",
+          label: "Student Name",
+          required: true,
+        },
+        {
+          name: "student_id",
+          type: "text",
+          label: "Student ID",
+          required: true,
+          placeholder: "XXXX-XXXX",
+        },
+        { name: "major", type: "text", label: "Academic Major" },
+        {
+          name: "grad_year",
+          type: "select",
+          label: "Graduation Year",
+          options: [
+            { label: "2024", value: "2024" },
+            { label: "2025", value: "2025" },
+            { label: "2026", value: "2026" },
+          ],
+        },
+      ],
+    },
+    designSchema: {
+      primaryColor: "#7c3aed",
+      backgroundColor: "#f5f3ff",
+      formBackground: "#ffffff",
+      textColor: "#4c1d95",
+      borderRadius: "xl",
+      spacing: "normal",
+      fieldStyles: {
+        labelPosition: "top",
+        inputVariant: "outline",
+      },
+      button: { text: "Register", variant: "default" },
     },
   },
 ];

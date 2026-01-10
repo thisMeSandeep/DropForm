@@ -1,6 +1,8 @@
 "use client";
 
 import { FormRenderer } from "@/components/custom/FormRenderer";
+import { FormPreviewCard } from "@/components/custom/FormPreviewThumbnail";
+import { FormTemplate, templates } from "@/data/formData";
 
 // Using the data from the file the user referenced
 const formSchema = {
@@ -8,7 +10,8 @@ const formSchema = {
     description: "Apply for the frontend developer role",
     brandLogo: "/sampleLogo.png",
     logoAlignment: "center" as const,
-    status: "published",
+    status: "published" as const,
+    createdAt: new Date().toISOString(),
     fieldSchema: {
         version: 1,
         fields: [
@@ -102,16 +105,51 @@ const formSchema = {
 };
 
 export default function PreviewDemoPage() {
+
+    const form: FormTemplate= templates[0];
+
+
     return (
-        <div className="min-h-screen bg-[#f8f9fa] flex justify-center py-12">
-            <FormRenderer
-                title={formSchema.title}
-                description={formSchema.description}
-                brandLogo={formSchema.brandLogo}
-                logoAlignment={formSchema.logoAlignment}
-                fields={formSchema.fieldSchema.fields}
-                design={formSchema.designSchema}
-            />
+        <div className="min-h-screen bg-[#f8fafc] py-12 px-6 flex flex-col items-center gap-16">
+
+            {/* Template Gallery Section */}
+            <div className="w-full max-w-6xl flex flex-col items-center gap-8">
+                <div className="text-center">
+                    <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 mb-2">Template Gallery</h2>
+                    <h1 className="text-3xl font-bold text-zinc-900">Choose a Template</h1>
+                    <p className="text-zinc-500 mt-2">Start with a professional layout and customize it to your needs.</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 w-full justify-items-center">
+                    {templates.map((template, idx) => (
+                        <FormPreviewCard
+                            key={idx}
+                            form={{
+                                ...template,
+                                createdAt: new Date().toISOString()
+                            }}
+                            onDelete={() => alert(`Delete clicked for: ${template.title}`)}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            {/* Individual Component Previews */}
+            <div className="w-full max-w-6xl border-t border-zinc-200 pt-16 flex flex-col items-center gap-16">
+
+
+                <div className="w-full flex flex-col items-center gap-6">
+                    <h2 className="text-xs font-bold uppercase tracking-widest text-zinc-400 text-center">Full Component: FormRenderer</h2>
+                    <FormRenderer
+                        title={form.title}
+                        description={form.description}
+                        brandLogo={form.brandLogo}
+                        logoAlignment={form.logoAlignment}
+                        fields={form.fieldSchema.fields}
+                        design={form.designSchema}
+                    />
+                </div>
+            </div>
         </div>
     );
 }
