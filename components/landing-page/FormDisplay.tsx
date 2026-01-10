@@ -9,6 +9,7 @@ import {
     useSpring,
 } from "framer-motion"
 import { useRef } from "react"
+import { useMediaQuery } from "@/hooks/useMediaQuery"
 
 const springConfig = {
     stiffness: 90,
@@ -19,42 +20,57 @@ const springConfig = {
 const FormDisplay = () => {
     const sectionRef = useRef(null)
 
+    const isMobile = useMediaQuery("(max-width: 640px)")
+    const isTablet = useMediaQuery("(max-width: 1024px)")
+
+    //  Responsive motion distances
+    const fanOutX = isMobile ? 90 : isTablet ? 140 : 260
+    const rotateDeg = isMobile ? 6 : isTablet ? 10 : 14
+
     const { scrollYProgress } = useScroll({
         target: sectionRef,
         offset: ["start 85%", "end 15%"],
     })
 
-    // Fade in early
     const opacity = useTransform(scrollYProgress, [0, 0.15], [0, 1])
 
-    // LEFT card — already fanned out
-    const leftXRaw = useTransform(scrollYProgress, [0, 0.6], [-140, -260])
-    const leftRotateRaw = useTransform(scrollYProgress, [0, 0.6], [-8, -14])
-    const leftScaleRaw = useTransform(scrollYProgress, [0, 0.6], [0.96, 1])
+    // LEFT
+    const leftX = useSpring(
+        useTransform(scrollYProgress, [0, 0.6], [-fanOutX / 2, -fanOutX]),
+        springConfig
+    )
+    const leftRotate = useSpring(
+        useTransform(scrollYProgress, [0, 0.6], [-rotateDeg / 2, -rotateDeg]),
+        springConfig
+    )
+    const leftScale = useSpring(
+        useTransform(scrollYProgress, [0, 0.6], [0.97, 1]),
+        springConfig
+    )
 
-    // RIGHT card — already fanned out
-    const rightXRaw = useTransform(scrollYProgress, [0, 0.6], [140, 260])
-    const rightRotateRaw = useTransform(scrollYProgress, [0, 0.6], [8, 14])
-    const rightScaleRaw = useTransform(scrollYProgress, [0, 0.6], [0.96, 1])
-
-    // Smooth them
-    const leftX = useSpring(leftXRaw, springConfig)
-    const leftRotate = useSpring(leftRotateRaw, springConfig)
-    const leftScale = useSpring(leftScaleRaw, springConfig)
-
-    const rightX = useSpring(rightXRaw, springConfig)
-    const rightRotate = useSpring(rightRotateRaw, springConfig)
-    const rightScale = useSpring(rightScaleRaw, springConfig)
+    // RIGHT
+    const rightX = useSpring(
+        useTransform(scrollYProgress, [0, 0.6], [fanOutX / 2, fanOutX]),
+        springConfig
+    )
+    const rightRotate = useSpring(
+        useTransform(scrollYProgress, [0, 0.6], [rotateDeg / 2, rotateDeg]),
+        springConfig
+    )
+    const rightScale = useSpring(
+        useTransform(scrollYProgress, [0, 0.6], [0.97, 1]),
+        springConfig
+    )
 
     return (
         <section
             ref={sectionRef}
-            className="relative px-4 pt-32 pb-40 overflow-visible"
+            className="relative px-4 pt-24 md:pt-32 pb-32 md:pb-40 overflow-visible"
         >
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="text-center mb-20">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                <div className="text-center mb-14 md:mb-20">
+                    <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
                         Build modern forms within seconds
                     </h2>
                     <p className="text-gray-400 max-w-2xl mx-auto">
@@ -63,69 +79,72 @@ const FormDisplay = () => {
                 </div>
 
                 {/* Cards */}
-                <div className="relative h-[520px] flex items-center justify-center overflow-visible">
+                <div className="relative h-[360px] sm:h-[420px] md:h-[520px] flex items-center justify-center">
                     {/* LEFT */}
                     <motion.div
-                        style={{
-                            x: leftX,
-                            rotateZ: leftRotate,
-                            scale: leftScale,
-                            opacity,
-                        }}
-                        className="absolute w-[300px] h-[440px] rounded-2xl bg-white shadow-2xl z-0"
+                        style={{ x: leftX, rotateZ: leftRotate, scale: leftScale, opacity }}
+                        className="
+                            absolute
+                            w-[180px] h-[260px]
+                            sm:w-[240px] sm:h-[360px]
+                            md:w-[300px] md:h-[440px]
+                            rounded-2xl bg-white shadow-2xl
+                        "
                     >
-                        <div className="relative w-full h-full p-4">
-                            <Image
-                                src="/form1.png"
-                                alt="Form 1"
-                                fill
-                                unoptimized
-                                className="object-contain rounded-xl"
-                            />
-                        </div>
+                        <Image
+                            src="/form1.png"
+                            alt="Form 1"
+                            fill
+                            unoptimized
+                            className="object-contain p-4 rounded-xl"
+                        />
                     </motion.div>
 
                     {/* CENTER */}
                     <motion.div
                         style={{ opacity }}
-                        className="relative w-[340px] h-[480px] rounded-2xl bg-white shadow-[0_40px_90px_rgba(0,0,0,0.35)] z-10"
+                        className="
+                            relative z-10
+                            w-[210px] h-[300px]
+                            sm:w-[280px] sm:h-[400px]
+                            md:w-[340px] md:h-[480px]
+                            rounded-2xl bg-white
+                            shadow-[0_40px_90px_rgba(0,0,0,0.35)]
+                        "
                     >
-                        <div className="relative w-full h-full p-4">
-                            <Image
-                                src="/form2.png"
-                                alt="Form 2"
-                                fill
-                                priority
-                                unoptimized
-                                className="object-contain rounded-xl"
-                            />
-                        </div>
+                        <Image
+                            src="/form2.png"
+                            alt="Form 2"
+                            fill
+                            priority
+                            unoptimized
+                            className="object-contain p-4 rounded-xl"
+                        />
                     </motion.div>
 
                     {/* RIGHT */}
                     <motion.div
-                        style={{
-                            x: rightX,
-                            rotateZ: rightRotate,
-                            scale: rightScale,
-                            opacity,
-                        }}
-                        className="absolute w-[300px] h-[440px] rounded-2xl bg-white shadow-2xl z-0"
+                        style={{ x: rightX, rotateZ: rightRotate, scale: rightScale, opacity }}
+                        className="
+                            absolute
+                            w-[180px] h-[260px]
+                            sm:w-[240px] sm:h-[360px]
+                            md:w-[300px] md:h-[440px]
+                            rounded-2xl bg-white shadow-2xl
+                        "
                     >
-                        <div className="relative w-full h-full p-4">
-                            <Image
-                                src="/form3.png"
-                                alt="Form 3"
-                                fill
-                                unoptimized
-                                className="object-contain rounded-xl"
-                            />
-                        </div>
+                        <Image
+                            src="/form3.png"
+                            alt="Form 3"
+                            fill
+                            unoptimized
+                            className="object-contain p-4 rounded-xl"
+                        />
                     </motion.div>
                 </div>
 
                 {/* CTA */}
-                <div className="text-center mt-16">
+                <div className="text-center mt-12 md:mt-16">
                     <button className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition">
                         Get started free
                         <ArrowRight className="w-4 h-4" />
