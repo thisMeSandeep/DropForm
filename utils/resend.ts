@@ -16,9 +16,9 @@ export async function sendEmail({
       from: "Drop Form <onboarding@drop-form.com>",
       to,
       subject,
-      html: text,
+      html: `<p>${text}</p>`, // Convert text to HTML
     });
   } catch (error) {
-    console.error(error);
+    console.error("Failed to send email:", error);
   }
 }

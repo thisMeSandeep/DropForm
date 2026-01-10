@@ -1,181 +1,212 @@
 "use client"
+import { signIn } from "@/utils/auth-client"
+import { useState, useEffect } from "react"
 
-import React, { useState } from "react"
-import Link from "next/link"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm } from "react-hook-form"
-import * as z from "zod"
-import { Eye, EyeOff } from "lucide-react"
+const Login = () => {
+    const [formData, setFormdata] = useState({
+        email: "",
+        password: "",
+    })
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldError,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import ButtonWithLoader from "@/components/custom/ButtonWithLoader"
 
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address."),
-  password: z.string().min(1, "Password is required."),
-})
+    // handle onChnage
+    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const { name, value } = e.target;
+        setFormdata((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    }
 
-type LoginFormValues = z.infer<typeof loginSchema>
 
-export default function LoginPage() {
-  const [showPassword, setShowPassword] = useState(false)
+    // handle login
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const { error } = await signIn.email({
+                email: formData.email,
+                password: formData.password,
+                rememberMe: true,
+                callbackURL: `/dashboard`
+            });
 
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  })
+            if (error) {
+                throw new Error(error.message);
+            }
 
-  const { isSubmitting } = form.formState
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                alert(err.message);
+                console.error("Signup error:", err.message);
+            } else {
+                const errorMsg = "An unexpected error occurred";
+                alert(errorMsg);
+                console.error("Signup error:", err)
+            }
+        }
+    }
 
-  function onSubmit(data: LoginFormValues) {
-    console.log("Login Data:", data)
-  }
 
-  return (
-    <div className="min-h-screen bg-zinc-50 flex items-center justify-center px-4 py-12">
-      <div className="flex flex-col gap-6 w-full max-w-sm">
-        <Card className="border-zinc-200 shadow-xl rounded-2xl">
-          <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl font-bold text-zinc-900 border-b-0">
-              Welcome back
-            </CardTitle>
-            <CardDescription className="text-zinc-500 font-medium">
-              Enter your email to sign in to your account
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <FieldGroup className="space-y-2.5">
-                <Controller
-                  name="email"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid} className="space-y-1">
-                      <FieldLabel htmlFor={field.name} className="text-zinc-700 font-semibold text-xs uppercase tracking-wider">
-                        Email address
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        type="email"
-                        placeholder="m@example.com"
-                        className="h-10 border-zinc-200 bg-zinc-50 text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-zinc-900/5 focus-visible:border-zinc-400 transition-all rounded-lg"
-                      />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    </Field>
-                  )}
-                />
+    // Check for OAuth errors in URL parameters when component mounts
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const params = new URLSearchParams(window.location.search);
+            const error = params.get("error");
+            if (error) {
+                setErrorMessage(error === "access_denied"
+                    ? "Sign in was cancelled. Please try again."
+                    : "An error occurred during sign in. Please try again.");
+                // Clean up URL by removing error parameter
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.delete("error");
+                window.history.replaceState({}, "", newUrl.pathname);
+            }
+        }
+    }, []);
 
-                <Controller
-                  name="password"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid} className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <FieldLabel htmlFor={field.name} className="text-zinc-700 font-semibold text-xs uppercase tracking-wider">
-                          Password
-                        </FieldLabel>
-                        <Link
-                          href="/forget-password"
-                          className="text-xs font-semibold text-zinc-500 hover:text-zinc-900 hover:underline underline-offset-4 transition-all"
-                        >
-                          Forgot?
-                        </Link>
-                      </div>
-                      <div className="relative">
-                        <Input
-                          {...field}
-                          id={field.name}
-                          type={showPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          className="h-10 border-zinc-200 bg-zinc-50 pr-10 text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-zinc-900/5 focus-visible:border-zinc-400 transition-all rounded-lg"
+    // Google Sign in 
+    const googleSignIn = async () => {
+        try {
+            setErrorMessage(null);
+            // For OAuth flows, signIn.social() will redirect to the provider
+            // After successful auth, Better Auth redirects to callbackURL
+            // On error, it will redirect back with error parameter
+            const { error } = await signIn.social({
+                provider: "google",
+                callbackURL: "/dashboard", // Redirect to dashboard on success
+            });
+
+            // If there's an immediate error (before redirect), handle it
+            if (error) {
+                setErrorMessage(error.message || "Failed to initiate Google sign in");
+                console.error("Google sign in error:", error.message);
+            }
+            // Note: If successful, the user will be redirected to Google, 
+            // then back to callbackURL after authentication
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setErrorMessage(err.message || "An unexpected error occurred");
+                console.error("Google sign in error:", err.message);
+            } else {
+                setErrorMessage("An unexpected error occurred");
+                console.error("Google sign in error:", err);
+            }
+        }
+    };
+
+
+    // GitHub Sign in 
+    const githubSignIn = async () => {
+        try {
+            setErrorMessage(null);
+            // For OAuth flows, signIn.social() will redirect to the provider
+            // After successful auth, Better Auth redirects to callbackURL
+            // On error, it will redirect back with error parameter
+            const { error } = await signIn.social({
+                provider: "github",
+                callbackURL: "/dashboard", // Redirect to dashboard on success
+            });
+
+            // If there's an immediate error (before redirect), handle it
+            if (error) {
+                setErrorMessage(error.message || "Failed to initiate GitHub sign in");
+                console.error("GitHub sign in error:", error.message);
+            }
+            // Note: If successful, the user will be redirected to GitHub, 
+            // then back to callbackURL after authentication
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setErrorMessage(err.message || "An unexpected error occurred");
+                console.error("GitHub sign in error:", err.message);
+            } else {
+                setErrorMessage("An unexpected error occurred");
+                console.error("GitHub sign in error:", err);
+            }
+        }
+    };
+
+    return (
+        <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="w-full max-w-md">
+                <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
+
+                {errorMessage && (
+                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                        {errorMessage}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label htmlFor="email" className="block mb-1">
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded"
+                            required
                         />
+                    </div>
+
+                    <div>
+                        <label htmlFor="password" className="block mb-1">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded"
+                            required
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        Login
+                    </button>
+                </form>
+
+                <div className="mt-6">
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 space-y-3">
                         <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
+                            type="button"
+                            onClick={googleSignIn}
+                            className="w-full px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
                         >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            Google
                         </button>
-                      </div>
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    </Field>
-                  )}
-                />
 
-                <Field className="pt-2 space-y-2">
-                  <ButtonWithLoader
-                    type="submit"
-                    loading={isSubmitting}
-                    className="h-10 w-full bg-zinc-900 text-white font-semibold hover:bg-zinc-800 transition-all rounded-lg shadow-sm"
-                  >
-                    Sign In
-                  </ButtonWithLoader>
-                </Field>
-
-                <div className="relative py-2">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-zinc-100" />
-                  </div>
-                  <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest">
-                    <span className="bg-white px-2 text-zinc-400">
-                      Or continue with
-                    </span>
-                  </div>
+                        <button
+                            type="button"
+                            onClick={githubSignIn}
+                            className="w-full px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                        >
+                            GitHub
+                        </button>
+                    </div>
                 </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-9 border-zinc-200 bg-white text-zinc-700 font-semibold text-xs hover:bg-zinc-50 transition-all rounded-lg"
-                    onClick={() => console.log("Google Login")}
-                  >
-                    Google
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-9 border-zinc-200 bg-white text-zinc-700 font-semibold text-xs hover:bg-zinc-50 transition-all rounded-lg"
-                    onClick={() => console.log("GitHub Login")}
-                  >
-                    GitHub
-                  </Button>
-                </div>
-
-                <FieldDescription className="text-center text-sm pt-2">
-                  Don't have an account?{" "}
-                  <Link href="/signup" className="font-semibold text-zinc-900 hover:underline underline-offset-4">
-                    Sign up
-                  </Link>
-                </FieldDescription>
-              </FieldGroup>
-            </form>
-          </CardContent>
-        </Card>
-        <FieldDescription className="px-6 text-center text-zinc-500 text-xs">
-          By signing in, you agree to our <a href="#" className="underline underline-offset-2 hover:text-zinc-900">Terms</a>{" "}
-          and <a href="#" className="underline underline-offset-2 hover:text-zinc-900">Privacy Policy</a>.
-        </FieldDescription>
-      </div>
-    </div>
-  )
+            </div>
+        </div>
+    )
 }
+
+export default Login

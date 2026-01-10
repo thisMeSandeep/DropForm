@@ -18,11 +18,10 @@ First-time OAuth users create their account through the login flow.
 
 1. User signs up using email and password.
 2. The system creates the user account.
-3. The user is authenticated immediately.
-4. A verification email containing a secure link is sent asynchronously.
-5. The user is redirected to the dashboard in a **restricted state** until email verification is completed.
+3. User need to varify thier email first.
+4. after Varification, login them from varify-email page.
 
-Signup must succeed even if email delivery is delayed or fails.
+
 
 ---
 
