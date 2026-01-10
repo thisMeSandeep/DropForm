@@ -103,8 +103,8 @@ const Signup = () => {
                 <CardContent className="p-6 flex flex-col gap-6">
                     <div className="text-center">
                         <h1 className="text-2xl font-bold">Create an Account</h1>
-                        <p className="text-muted-foreground text-sm mt-1">
-                            Join us and start managing your forms
+                        <p className="text-gray-600 text-sm mt-1">
+                            Join DropForm and start managing your forms
                         </p>
                     </div>
 

@@ -121,7 +121,8 @@ const Login = () => {
       <Card className="w-full max-w-md rounded-2xl shadow-[0_20px_50px_rgba(3,0,20,0.4)] border border-white/10 bg-background/60 backdrop-blur-xl">
         <CardContent className="p-6 flex flex-col gap-6">
           <div className="text-center">
-            <h1 className="text-2xl font-bold">Login</h1>
+            <h1 className="text-2xl font-bold">Sign in to DropForm</h1>
+            <p className="text-sm text-gray-600 mt-1">Welcome back! please sign in to continue.</p>
           </div>
 
           {errorMessage && (
