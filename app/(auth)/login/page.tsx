@@ -1,212 +1,225 @@
 "use client"
+
 import { signIn } from "@/utils/auth-client"
 import { useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import Image from "next/image"
+import Link from "next/link"
+import { Mail, Lock } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import ButtonWithLoader from "@/components/custom/ButtonWithLoader"
+import { Card, CardContent } from "@/components/ui/card"
+import { FormField } from "@/components/ui/form-field"
+
+// Zod validation schema
+const loginSchema = z.object({
+  email: z.email("Please enter a valid email address"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(6, "Password must be at least 6 characters"),
+})
+
+type LoginFormData = z.infer<typeof loginSchema>
 
 const Login = () => {
-    const [formData, setFormdata] = useState({
-        email: "",
-        password: "",
-    })
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  })
 
-    // handle onChnage
-    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const { name, value } = e.target;
-        setFormdata((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+  // Check for OAuth errors in URL parameters when component mounts
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const error = params.get("error")
+      if (error) {
+        setErrorMessage(
+          error === "access_denied"
+            ? "Sign in was cancelled. Please try again."
+            : "An error occurred during sign in. Please try again."
+        )
+        // Clean up URL by removing error parameter
+        const newUrl = new URL(window.location.href)
+        newUrl.searchParams.delete("error")
+        window.history.replaceState({}, "", newUrl.pathname)
+      }
     }
+  }, [])
 
+  // Handle email/password login
+  const onSubmit = async (data: LoginFormData) => {
+    setIsSubmitting(true)
+    setErrorMessage(null)
 
-    // handle login
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            const { error } = await signIn.email({
-                email: formData.email,
-                password: formData.password,
-                rememberMe: true,
-                callbackURL: `/dashboard`
-            });
+    try {
+      const { error } = await signIn.email({
+        email: data.email,
+        password: data.password,
+        rememberMe: true,
+        callbackURL: `/dashboard`,
+      })
 
-            if (error) {
-                throw new Error(error.message);
-            }
-
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                alert(err.message);
-                console.error("Signup error:", err.message);
-            } else {
-                const errorMsg = "An unexpected error occurred";
-                alert(errorMsg);
-                console.error("Signup error:", err)
-            }
-        }
+      if (error) {
+        // Set error message for display
+        setErrorMessage(error.message || "Invalid credentials")
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrorMessage(err.message || "An unexpected error occurred")
+        console.error("Login error:", err.message)
+      } else {
+        setErrorMessage("An unexpected error occurred")
+        console.error("Login error:", err)
+      }
+    } finally {
+      setIsSubmitting(false)
     }
+  }
 
+  // Social Sign in (Google, GitHub)
+  const socialSignIn = async (provider: "google" | "github") => {
+    try {
+      setErrorMessage(null)
+      const { error } = await signIn.social({
+        provider,
+        callbackURL: "/dashboard",
+      })
 
-    // Check for OAuth errors in URL parameters when component mounts
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const params = new URLSearchParams(window.location.search);
-            const error = params.get("error");
-            if (error) {
-                setErrorMessage(error === "access_denied"
-                    ? "Sign in was cancelled. Please try again."
-                    : "An error occurred during sign in. Please try again.");
-                // Clean up URL by removing error parameter
-                const newUrl = new URL(window.location.href);
-                newUrl.searchParams.delete("error");
-                window.history.replaceState({}, "", newUrl.pathname);
-            }
-        }
-    }, []);
+      if (error) {
+        const providerName = provider === "google" ? "Google" : "GitHub"
+        setErrorMessage(
+          error.message || `Failed to initiate ${providerName} sign in`
+        )
+        console.error(`${providerName} sign in error:`, error.message)
+      }
+    } catch (err: unknown) {
+      const providerName = provider === "google" ? "Google" : "GitHub"
+      if (err instanceof Error) {
+        setErrorMessage(err.message || "An unexpected error occurred")
+        console.error(`${providerName} sign in error:`, err.message)
+      } else {
+        setErrorMessage("An unexpected error occurred")
+        console.error(`${providerName} sign in error:`, err)
+      }
+    }
+  }
 
-    // Google Sign in 
-    const googleSignIn = async () => {
-        try {
-            setErrorMessage(null);
-            // For OAuth flows, signIn.social() will redirect to the provider
-            // After successful auth, Better Auth redirects to callbackURL
-            // On error, it will redirect back with error parameter
-            const { error } = await signIn.social({
-                provider: "google",
-                callbackURL: "/dashboard", // Redirect to dashboard on success
-            });
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <Card className="w-full max-w-md rounded-2xl shadow-md border bg-background">
+        <CardContent className="p-6 flex flex-col gap-6">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold">Login</h1>
+          </div>
 
-            // If there's an immediate error (before redirect), handle it
-            if (error) {
-                setErrorMessage(error.message || "Failed to initiate Google sign in");
-                console.error("Google sign in error:", error.message);
-            }
-            // Note: If successful, the user will be redirected to Google, 
-            // then back to callbackURL after authentication
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                setErrorMessage(err.message || "An unexpected error occurred");
-                console.error("Google sign in error:", err.message);
-            } else {
-                setErrorMessage("An unexpected error occurred");
-                console.error("Google sign in error:", err);
-            }
-        }
-    };
-
-
-    // GitHub Sign in 
-    const githubSignIn = async () => {
-        try {
-            setErrorMessage(null);
-            // For OAuth flows, signIn.social() will redirect to the provider
-            // After successful auth, Better Auth redirects to callbackURL
-            // On error, it will redirect back with error parameter
-            const { error } = await signIn.social({
-                provider: "github",
-                callbackURL: "/dashboard", // Redirect to dashboard on success
-            });
-
-            // If there's an immediate error (before redirect), handle it
-            if (error) {
-                setErrorMessage(error.message || "Failed to initiate GitHub sign in");
-                console.error("GitHub sign in error:", error.message);
-            }
-            // Note: If successful, the user will be redirected to GitHub, 
-            // then back to callbackURL after authentication
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                setErrorMessage(err.message || "An unexpected error occurred");
-                console.error("GitHub sign in error:", err.message);
-            } else {
-                setErrorMessage("An unexpected error occurred");
-                console.error("GitHub sign in error:", err);
-            }
-        }
-    };
-
-    return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="w-full max-w-md">
-                <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
-
-                {errorMessage && (
-                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                        {errorMessage}
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label htmlFor="email" className="block mb-1">
-                            Email
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label htmlFor="password" className="block mb-1">
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded"
-                            required
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                        Login
-                    </button>
-                </form>
-
-                <div className="mt-6">
-                    <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-300"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-white text-gray-500">Or continue with</span>
-                        </div>
-                    </div>
-
-                    <div className="mt-4 space-y-3">
-                        <button
-                            type="button"
-                            onClick={googleSignIn}
-                            className="w-full px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
-                        >
-                            Google
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={githubSignIn}
-                            className="w-full px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
-                        >
-                            GitHub
-                        </button>
-                    </div>
-                </div>
+          {errorMessage && (
+            <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-sm">
+              {errorMessage}
             </div>
-        </div>
-    )
+          )}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+            {/* Email Field */}
+            <FormField
+              id="email"
+              label="Email"
+              type="email"
+              placeholder="Enter your email"
+              icon={Mail}
+              error={errors.email?.message}
+              inputProps={register("email")}
+            />
+
+            {/* Password Field */}
+            <FormField
+              id="password"
+              label="Password"
+              type="password"
+              placeholder="Enter your password"
+              icon={Lock}
+              error={errors.password?.message}
+              inputProps={register("password")}
+            />
+
+            {/* Submit Button */}
+            <ButtonWithLoader
+              type="submit"
+              variant="default"
+              className="w-full h-12 text-base font-medium rounded-lg"
+              loading={isSubmitting}
+              loadingText="Signing in..."
+            >
+              Sign In
+            </ButtonWithLoader>
+          </form>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-background text-muted-foreground">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
+          {/* Social Login Buttons */}
+          <div className="flex flex-col gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-12 rounded-lg flex items-center justify-center gap-3"
+              onClick={() => socialSignIn("google")}
+            >
+              <Image
+                src="/google.svg"
+                alt="Google"
+                width={20}
+                height={20}
+                className="shrink-0"
+              />
+              Continue with Google
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-12 rounded-lg flex items-center justify-center gap-3"
+              onClick={() => socialSignIn("github")}
+            >
+              <Image
+                src="/github.svg"
+                alt="GitHub"
+                width={20}
+                height={20}
+                className="shrink-0"
+              />
+              Continue with GitHub
+            </Button>
+          </div>
+
+          {/* Signup Link */}
+          <p className="text-center text-sm text-muted-foreground mt-2">
+            Don&apos;t have an account?{" "}
+            <Link href="/signup" className="text-primary cursor-pointer hover:underline font-medium">
+              Sign Up
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
 
 export default Login

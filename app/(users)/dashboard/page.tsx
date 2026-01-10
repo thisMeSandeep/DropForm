@@ -1,4 +1,3 @@
-import Logout from "@/components/auth/Logout";
 import { auth } from "@/utils/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -37,7 +36,6 @@ const Dashboard = async () => {
         {user.image && <p>Profile Image: {user.image}</p>}
       </div>
 
-      <Logout />
     </div>
   )
 }

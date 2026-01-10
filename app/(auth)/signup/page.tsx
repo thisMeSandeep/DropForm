@@ -1,136 +1,218 @@
-"use client";
+"use client"
 
-import { signUp } from "@/utils/auth-client";
-import { useState } from "react";
-import Link from "next/link";
+import { signUp, signIn } from "@/utils/auth-client"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import Image from "next/image"
+import Link from "next/link"
+import { Mail, Lock, User } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import ButtonWithLoader from "@/components/custom/ButtonWithLoader"
+import { Card, CardContent } from "@/components/ui/card"
+import { FormField } from "@/components/ui/form-field"
+
+// Zod validation schema
+const signupSchema = z.object({
+    name: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.email("Please enter a valid email address"),
+    password: z
+        .string()
+        .min(1, "Password is required")
+        .min(6, "Password must be at least 6 characters"),
+})
+
+type SignupFormData = z.infer<typeof signupSchema>
 
 const Signup = () => {
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const [user, setUser] = useState({
-        name: "",
-        email: "",
-        password: "",
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<SignupFormData>({
+        resolver: zodResolver(signupSchema),
     })
 
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-
-    // handle onChnage
-    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const { name, value } = e.target;
-        setUser((prevUser) => ({
-            ...prevUser,
-            [name]: value,
-        }));
-    }
-
-    // Sign-up user - automatically signs in and redirects to dashboard
-    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        setErrorMessage(null);
+    // Handle email/password signup
+    const onSubmit = async (data: SignupFormData) => {
+        setIsSubmitting(true)
+        setErrorMessage(null)
 
         try {
             const { error } = await signUp.email({
-                name: user.name,
-                email: user.email,
-                password: user.password,
-                callbackURL: "/dashboard", // Redirect to dashboard after successful signup and auto-signin
-            });
+                name: data.name,
+                email: data.email,
+                password: data.password,
+                callbackURL: `/dashboard`,
+            })
 
             if (error) {
-                throw new Error(error.message);
+                setErrorMessage(error.message || "Something went wrong during sign up")
             }
-
-            // User will be automatically signed in and redirected to dashboard
-            // No need to show success message as redirect happens automatically
         } catch (err: unknown) {
             if (err instanceof Error) {
-                setErrorMessage(err.message);
-                console.error("Signup error:", err.message);
+                setErrorMessage(err.message || "An unexpected error occurred")
+                console.error("Signup error:", err.message)
             } else {
-                const errorMsg = "An unexpected error occurred";
-                setErrorMessage(errorMsg);
+                setErrorMessage("An unexpected error occurred")
                 console.error("Signup error:", err)
+            }
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
+    // Social Sign in (Google, GitHub)
+    const socialSignIn = async (provider: "google" | "github") => {
+        try {
+            setErrorMessage(null)
+            const { error } = await signIn.social({
+                provider,
+                callbackURL: "/dashboard",
+            })
+
+            if (error) {
+                const providerName = provider === "google" ? "Google" : "GitHub"
+                setErrorMessage(
+                    error.message || `Failed to initiate ${providerName} sign in`
+                )
+                console.error(`${providerName} sign in error:`, error.message)
+            }
+        } catch (err: unknown) {
+            const providerName = provider === "google" ? "Google" : "GitHub"
+            if (err instanceof Error) {
+                setErrorMessage(err.message || "An unexpected error occurred")
+                console.error(`${providerName} sign in error:`, err.message)
+            } else {
+                setErrorMessage("An unexpected error occurred")
+                console.error(`${providerName} sign in error:`, err)
             }
         }
     }
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="w-full max-w-md">
-                <h1 className="text-2xl font-bold mb-6 text-center">Sign Up</h1>
-
-                {errorMessage && (
-                    <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded">
-                        <p className="text-red-800">{errorMessage}</p>
+            <Card className="w-full max-w-md rounded-2xl shadow-md border bg-background">
+                <CardContent className="p-6 flex flex-col gap-6">
+                    <div className="text-center">
+                        <h1 className="text-2xl font-bold">Create an Account</h1>
+                        <p className="text-muted-foreground text-sm mt-1">
+                            Join us and start managing your forms
+                        </p>
                     </div>
-                )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-
-                        <div>
-                            <label htmlFor="email" className="block mb-1">
-                                Name
-                            </label>
-                            <input
-                                type="text"
-                                id="name"
-                                name="name"
-                                value={user.name}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded"
-                                required
-                            />
+                    {errorMessage && (
+                        <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-sm">
+                            {errorMessage}
                         </div>
+                    )}
 
+                    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+                        {/* Name Field */}
+                        <FormField
+                            id="name"
+                            label="Full Name"
+                            type="text"
+                            placeholder="Enter your full name"
+                            icon={User}
+                            error={errors.name?.message}
+                            inputProps={register("name")}
+                        />
 
-                        <div>
-                            <label htmlFor="email" className="block mb-1">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={user.email}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded"
-                                required
-                            />
-                        </div>
+                        {/* Email Field */}
+                        <FormField
+                            id="email"
+                            label="Email"
+                            type="email"
+                            placeholder="Enter your email"
+                            icon={Mail}
+                            error={errors.email?.message}
+                            inputProps={register("email")}
+                        />
 
-                        <div>
-                            <label htmlFor="password" className="block mb-1">
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                value={user.password}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded"
-                                required
-                            />
-                        </div>
+                        {/* Password Field */}
+                        <FormField
+                            id="password"
+                            label="Password"
+                            type="password"
+                            placeholder="Create a password"
+                            icon={Lock}
+                            error={errors.password?.message}
+                            inputProps={register("password")}
+                        />
 
-                        <button
+                        {/* Submit Button */}
+                        <ButtonWithLoader
                             type="submit"
-                            className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            variant="default"
+                            className="w-full h-12 text-base font-medium rounded-lg"
+                            loading={isSubmitting}
+                            loadingText="Creating account..."
                         >
                             Sign Up
-                        </button>
+                        </ButtonWithLoader>
                     </form>
 
-                <div className="mt-6 text-center">
-                    <p className="text-sm text-gray-600">
+                    {/* Divider */}
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-border"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-background text-muted-foreground">
+                                Or continue with
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Social Login Buttons */}
+                    <div className="flex flex-col gap-3">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full h-12 rounded-lg flex items-center justify-center gap-3"
+                            onClick={() => socialSignIn("google")}
+                        >
+                            <Image
+                                src="/google.svg"
+                                alt="Google"
+                                width={20}
+                                height={20}
+                                className="shrink-0"
+                            />
+                            Continue with Google
+                        </Button>
+
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full h-12 rounded-lg flex items-center justify-center gap-3"
+                            onClick={() => socialSignIn("github")}
+                        >
+                            <Image
+                                src="/github.svg"
+                                alt="GitHub"
+                                width={20}
+                                height={20}
+                                className="shrink-0"
+                            />
+                            Continue with GitHub
+                        </Button>
+                    </div>
+
+                    {/* Login Link */}
+                    <p className="text-center text-sm text-muted-foreground mt-2">
                         Already have an account?{" "}
-                        <Link href="/login" className="text-blue-600 hover:underline">
-                            Login
+                        <Link href="/login" className="text-primary cursor-pointer hover:underline font-medium">
+                            Sign In
                         </Link>
                     </p>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     )
 }
