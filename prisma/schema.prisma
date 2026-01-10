@@ -10,16 +10,25 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
 model User {
   id            String    @id
   name          String
   email         String
   emailVerified Boolean   @default(false)
   image         String?
+  role          Role      @default(USER)
+  responseLimit Int       @default(150)
+  responsesUsed Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  forms         Form[]
 
   @@unique([email])
   @@map("user")
@@ -71,4 +80,37 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Form {
+  id             String     @id @default(cuid())
+  userId         String
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?
+  fieldSchema    Json       @default("[]")
+  designSchema   Json       @default("{}")
+  status         String     @default("draft")
+  isArchived     Boolean    @default(false)
+  totalResponses Int        @default(0)
+  lastResponseAt DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  publishedAt    DateTime?
+  responses      Response[]
+
+  @@index([userId])
+  @@map("form")
+}
+
+model Response {
+  id        String   @id @default(cuid())
+  formId    String
+  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  values    Json
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([formId])
+  @@map("response")
 }
