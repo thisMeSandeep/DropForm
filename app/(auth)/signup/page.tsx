@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import ButtonWithLoader from "@/components/custom/ButtonWithLoader"
 import { Card, CardContent } from "@/components/ui/card"
 import { FormField } from "@/components/ui/form-field"
+import { BGPattern } from "@/components/ui/bg-pattern"
 
 // Zod validation schema
 const signupSchema = z.object({
@@ -95,8 +96,10 @@ const Signup = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <Card className="w-full max-w-md rounded-2xl shadow-md border bg-background">
+        <div className="min-h-screen flex items-center justify-center p-4 relative">
+            {/* Background Pattern */}
+            <BGPattern variant="grid" mask="fade-edges" fill="#030014" className="opacity-15" />
+            <Card className="w-full max-w-md rounded-2xl shadow-[0_20px_50px_rgba(3,0,20,0.4)] border border-white/10 bg-background/60 backdrop-blur-xl">
                 <CardContent className="p-6 flex flex-col gap-6">
                     <div className="text-center">
                         <h1 className="text-2xl font-bold">Create an Account</h1>
@@ -170,11 +173,11 @@ const Signup = () => {
                     </div>
 
                     {/* Social Login Buttons */}
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-row gap-3">
                         <Button
                             type="button"
                             variant="outline"
-                            className="w-full h-12 rounded-lg flex items-center justify-center gap-3"
+                            className="flex-1 h-12 rounded-lg flex items-center justify-center gap-2"
                             onClick={() => socialSignIn("google")}
                         >
                             <Image
@@ -184,13 +187,13 @@ const Signup = () => {
                                 height={20}
                                 className="shrink-0"
                             />
-                            Continue with Google
+                            Google
                         </Button>
 
                         <Button
                             type="button"
                             variant="outline"
-                            className="w-full h-12 rounded-lg flex items-center justify-center gap-3"
+                            className="flex-1 h-12 rounded-lg flex items-center justify-center gap-2"
                             onClick={() => socialSignIn("github")}
                         >
                             <Image
@@ -200,7 +203,7 @@ const Signup = () => {
                                 height={20}
                                 className="shrink-0"
                             />
-                            Continue with GitHub
+                            GitHub
                         </Button>
                     </div>
 
