@@ -1,7 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
-import { sendEmail } from "./resend";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -9,27 +8,8 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    autoSignIn: false,
-    requireEmailVerification: true,
-  },
-  emailVerification: {
-    sendOnSignUp: true,
-    autoSignInAfterVerification: true,
-    sendVerificationEmail: async ({ user, url }) => {
-      void sendEmail({
-        to: user.email,
-        subject: "Verify your email address",
-        text: `Click the link to verify your email: ${url}`,
-      })
-    },
-    async afterEmailVerification(user) {
-      // Send welcome email asynchronously (only once after verification)
-      void sendEmail({
-        to: user.email,
-        subject: "Welcome to Drop Form!",
-        text: `Welcome ${user.name}! Your email has been verified successfully.`,
-      })
-    },
+    autoSignIn: true, // Automatically sign in user after signup
+    requireEmailVerification: false, // No email verification required
   },
   socialProviders: {
     google: {

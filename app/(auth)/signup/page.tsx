@@ -12,7 +12,6 @@ const Signup = () => {
         password: "",
     })
 
-    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 
@@ -25,28 +24,25 @@ const Signup = () => {
         }));
     }
 
-    // Sign-up user 
+    // Sign-up user - automatically signs in and redirects to dashboard
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setErrorMessage(null);
-        setShowSuccessMessage(false);
 
         try {
             const { error } = await signUp.email({
                 name: user.name,
                 email: user.email,
                 password: user.password,
-                callbackURL: `${process.env.NEXT_PUBLIC_BETTER_AUTH_URL || window.location.origin}/email-varification`,
+                callbackURL: "/dashboard", // Redirect to dashboard after successful signup and auto-signin
             });
 
             if (error) {
                 throw new Error(error.message);
             }
 
-            // Show success message - user needs to verify email first
-            setShowSuccessMessage(true);
-            // Reset form
-            setUser({ name: "", email: "", password: "" });
+            // User will be automatically signed in and redirected to dashboard
+            // No need to show success message as redirect happens automatically
         } catch (err: unknown) {
             if (err instanceof Error) {
                 setErrorMessage(err.message);
@@ -59,22 +55,10 @@ const Signup = () => {
         }
     }
 
-
-  
-
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 <h1 className="text-2xl font-bold mb-6 text-center">Sign Up</h1>
-
-                {showSuccessMessage && (
-                    <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded">
-                        <p className="text-green-800">
-                            Account created successfully! Please check your email to verify your account.
-                            You will be redirected to the dashboard after verification.
-                        </p>
-                    </div>
-                )}
 
                 {errorMessage && (
                     <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded">
@@ -82,8 +66,7 @@ const Signup = () => {
                     </div>
                 )}
 
-                {!showSuccessMessage && (
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
 
                         <div>
                             <label htmlFor="email" className="block mb-1">
@@ -138,15 +121,15 @@ const Signup = () => {
                             Sign Up
                         </button>
                     </form>
-                )}
 
-                {showSuccessMessage && (
-                    <div className="text-center">
+                <div className="mt-6 text-center">
+                    <p className="text-sm text-gray-600">
+                        Already have an account?{" "}
                         <Link href="/login" className="text-blue-600 hover:underline">
-                            Go to Login
+                            Login
                         </Link>
-                    </div>
-                )}
+                    </p>
+                </div>
             </div>
         </div>
     )
