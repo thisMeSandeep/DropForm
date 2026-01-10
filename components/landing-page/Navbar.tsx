@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { Menu, X } from "lucide-react"
 import { BorderBeam } from "../ui/border-beam"
+import { useRouter } from "next/navigation"
 
 const navlinks = [
     { link: "Home", path: "/#home" },
@@ -29,6 +30,9 @@ const Navbar = () => {
     const closeMobileMenu = () => {
         setIsMobileMenuOpen(false)
     }
+
+
+    const router = useRouter();
 
     return (
         <div
@@ -108,7 +112,7 @@ const Navbar = () => {
                                 Login
                             </Link>
                             <button
-                                onClick={closeMobileMenu}
+                                onClick={() => router.push("/signup")}
                                 className="relative px-5 py-2 rounded-4xl border border-gray-100/20 hover:scale-105 transition-all duration-500 cursor-pointer w-fit"
                             >
                                 Start free trial
