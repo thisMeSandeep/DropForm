@@ -58,7 +58,7 @@ const UserFormEditor = () => {
                     </button>
                 </div>
 
-                <div className="hidden h-full xl:grid xl:grid-rows-1 xl:grid-cols-[320px_minmax(520px,1fr)_minmax(520px,1.1fr)] 2xl:grid-cols-[360px_minmax(600px,1fr)_minmax(640px,1.2fr)] gap-3">
+                <div className="hidden h-full xl:grid xl:grid-rows-1 xl:grid-cols-[300px_1fr_1fr] 2xl:grid-cols-[340px_1fr_1fr] gap-3">
                     <div className="h-full rounded-2xl border bg-white/70 backdrop-blur-sm shadow-sm overflow-hidden">
                         <div className="h-full overflow-auto">
                             <AiPromptPanel />
