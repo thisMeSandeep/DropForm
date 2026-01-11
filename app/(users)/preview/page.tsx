@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { useFormStore } from "@/store/useFormStore";
 import { FormRenderer } from "@/components/custom/FormRenderer";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,13 @@ const Preview = () => {
     const { form } = useFormStore();
     const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
+    const onMount = useEffectEvent(() => {
         setMounted(true);
+    }
+    );
+
+    useEffect(() => {
+        onMount();
     }, []);
 
     const handleSave = () => {
@@ -41,10 +46,10 @@ const Preview = () => {
 
                 <div className="flex items-center gap-3">
                     <Button variant="outline" size="sm" className="gap-2">
-                        <Share2 className="w-4 h-4" /> Share
+                        <Share2 className="w-4 h-4" /> <span className="hidden md:inline">Share</span>
                     </Button>
                     <Button size="sm" className="gap-2" onClick={handleSave}>
-                        <Save className="w-4 h-4" /> Save Form
+                        <Save className="w-4 h-4" /> <span className="hidden md:inline">Save</span>
                     </Button>
                 </div>
             </header>

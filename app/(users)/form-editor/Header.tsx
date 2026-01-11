@@ -39,8 +39,8 @@ const Header = ({ name, email, imageUrl, formTitle }: FormHeaderType) => {
         <div className="flex items-center justify-between px-6 py-3 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-50">
             {/* Logo */}
             <div className="flex items-center gap-2">
-                <File />
-                <p>{formTitle}</p>
+                <File className="size-10 text-gray-800"/>
+                <p className="text-xl text-gray-600">{formTitle}</p>
             </div>
 
 
