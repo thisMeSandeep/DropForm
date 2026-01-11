@@ -32,7 +32,7 @@ const FormHeader = ({ name, email, imageUrl }: FormHeaderType) => {
 
     const handleLogout = async () => {
         await signOut();
-        router.push("/sign-in"); // Redirect after logout
+        router.push("/"); // Redirect after logout
     };
 
     return (
