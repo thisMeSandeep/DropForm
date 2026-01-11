@@ -21,7 +21,7 @@ export const FormPreviewThumbnail = ({ form, onDelete }: FormPreviewCardProps) =
     // Redirect  based on form status
     const handleClick = () => {
         if (form.status === "published") {
-            router.push(`/dashboard/${form.id}`);
+            router.push(`/dashboard?id=${form.id}`);
         }
         if (form.status === "draft") {
             router.push(`/form-editor?id=${form.id}`);
