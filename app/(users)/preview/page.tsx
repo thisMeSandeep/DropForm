@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useEffectEvent, useState } from "react";
+import { Suspense, useEffect, useEffectEvent, useState } from "react";
 import { useFormStore } from "@/store/useFormStore";
 import { FormRenderer } from "@/components/custom/FormRenderer";
 import { Button } from "@/components/ui/button";
-import { Share2, ArrowLeft, Globe } from "lucide-react";
+import {  ArrowLeft, Globe } from "lucide-react";
 import Link from "next/link";
 import { publishForm } from "@/actions/form"; // Import newly created action
 import { toast } from "sonner";
-import { useRouter, useSearchParams } from "next/navigation";
+import {  useSearchParams } from "next/navigation";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -21,11 +21,11 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-const Preview = () => {
+const PreviewContent = () => {
     const { form, setForm } = useFormStore(); // Destructure setForm to update local state
     const [mounted, setMounted] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
-    const router = useRouter();
+   
 
 
     const searchParams = useSearchParams();
@@ -131,7 +131,7 @@ const Preview = () => {
                     description={form.description}
                     brandLogo={form.brandLogo}
                     logoAlignment={form.logoAlignment}
-                    fields={form.fieldSchema?.fields || []} // Safety check
+                    fields={form.fieldSchema?.fields || []}
                     design={form.designSchema}
                     readOnly={false}
                 />
@@ -139,5 +139,11 @@ const Preview = () => {
         </div>
     );
 };
+
+const Preview = () => (
+    <Suspense fallback={<div className="flex h-screen w-full items-center justify-center">Loading preview...</div>}>
+        <PreviewContent />
+    </Suspense>
+);
 
 export default Preview;

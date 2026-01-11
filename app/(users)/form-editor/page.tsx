@@ -6,15 +6,16 @@ import AiPromptPanel from '@/components/custom/AiPromptPanel';
 import Header from './Header';
 import { useSession } from "@/utils/auth-client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useFormStore } from '@/store/useFormStore';
 import { LayoutPanelLeft, PanelsTopLeft, Sparkles } from "lucide-react";
 import { useFormAutoSave } from "@/hooks/useFormAutoSave";
 import { createForm, getForm } from "@/actions/form";
+import { FormSchema } from "@/types/formSchema";
 
 type Pane = 'ai' | 'editor' | 'preview';
 
-const UserFormEditor = () => {
+const EditorContent = () => {
     const { data: session, isPending } = useSession();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -28,6 +29,31 @@ const UserFormEditor = () => {
 
     const formTitle = form.title || "Untitled Form";
     const [activePane, setActivePane] = useState<Pane>('editor');
+
+    const coerceLogoAlignment = (value: unknown): FormSchema["logoAlignment"] => {
+        return value === "center" || value === "right" ? value : "left";
+    };
+
+    const coerceStatus = (value: unknown): FormSchema["status"] => {
+        return value === "published" ? "published" : "draft";
+    };
+
+    const coerceFieldSchema = (value: unknown): FormSchema["fieldSchema"] => {
+        if (value && typeof value === "object") {
+            const maybe = value as { version?: unknown; fields?: unknown };
+            if (Array.isArray(maybe.fields)) {
+                return {
+                    version: typeof maybe.version === "number" ? maybe.version : 1,
+                    fields: maybe.fields as FormSchema["fieldSchema"]["fields"],
+                };
+            }
+        }
+        return { version: 1, fields: [] };
+    };
+
+    const coerceDesignSchema = (value: unknown): FormSchema["designSchema"] => {
+        return value && typeof value === "object" ? (value as FormSchema["designSchema"]) : {};
+    };
 
     useEffect(() => {
         if (!isPending && !session) {
@@ -45,19 +71,17 @@ const UserFormEditor = () => {
                 // Fetch existing form
                 const { success, data } = await getForm(formId);
                 if (success && data) {
-                    // Map DB data to FormSchema
-                    // NOTE: DB has fieldSchema/designSchema as Json.
-                    // We trust it matches our types or we might need validation/casting.
-                    const mappedForm: any = {
+                    // Map DB data to FormSchema with explicit casting to satisfy TS unions
+                    const mappedForm: FormSchema = {
                         id: data.id,
                         title: data.title,
                         description: data.description || "",
                         brandLogo: data.brandLogo || "",
-                        logoAlignment: (data.logoAlignment as string) || "left",
-                        status: (data.status as any) || "draft",
+                        logoAlignment: coerceLogoAlignment(data.logoAlignment),
+                        status: coerceStatus(data.status),
                         createdAt: data.createdAt.toISOString(),
-                        fieldSchema: data.fieldSchema,
-                        designSchema: data.designSchema,
+                        fieldSchema: coerceFieldSchema(data.fieldSchema),
+                        designSchema: coerceDesignSchema(data.designSchema),
                     };
                     setForm(mappedForm);
                 } else {
@@ -153,5 +177,11 @@ const UserFormEditor = () => {
         </div>
     );
 };
+
+const UserFormEditor = () => (
+    <Suspense fallback={<div className="flex h-screen w-full items-center justify-center">Loading form editor...</div>}>
+        <EditorContent />
+    </Suspense>
+);
 
 export default UserFormEditor;

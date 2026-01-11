@@ -6,6 +6,9 @@ import { redirect } from "next/navigation";
 import { getForms } from "@/actions/form";
 import { FormCardWrapper } from "@/components/custom/FormCardWrapper";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const Forms = async () => {
   // ... existing session logic ...
   let session;

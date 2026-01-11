@@ -63,6 +63,18 @@ const initialSchema: FormSchema = {
   },
 };
 
+// Avoid touching browser storage during SSR/prerender.
+const safeStorage = createJSONStorage(() => {
+  if (typeof window === "undefined") {
+    return {
+      getItem: () => null,
+      setItem: () => null,
+      removeItem: () => null,
+    } as const;
+  }
+  return localStorage;
+});
+
 export const useFormStore = create<FormState>()(
   persist(
     (set) => ({
@@ -166,7 +178,7 @@ export const useFormStore = create<FormState>()(
     }),
     {
       name: "form-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: safeStorage,
     }
   )
 );
