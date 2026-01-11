@@ -335,3 +335,107 @@ export async function updateFormStatus(id: string, status: "draft" | "published"
     return { success: false, error: "Failed to update status" };
   }
 }
+
+// Get public form data
+export async function getPublicForm(id: string) {
+  try {
+    const form = await prisma.form.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        fieldSchema: true,
+        designSchema: true,
+        brandLogo: true,
+        logoAlignment: true,
+      }
+    });
+
+    if (!form) {
+      return { success: false, error: "Form not found" };
+    }
+
+    // Only allow published or paused forms to be fetched (paused will show a specific message in UI)
+    if (form.status === 'draft' || form.status === 'archived') {
+         return { success: false, error: "Form not found" };
+    }
+
+    const formattedForm: Partial<FormSchema> = {
+      ...form,
+      logoAlignment: form.logoAlignment as "left" | "center" | "right",
+      status: form.status as "published" | "draft" | "paused" | "closed",
+      fieldSchema: form.fieldSchema as unknown as {
+        version: number;
+        fields: FormField[];
+      },
+      designSchema: form.designSchema as unknown as FormDesign,
+    };
+
+    return { success: true, data: formattedForm };
+  } catch (error) {
+    console.error("Failed to get public form:", error);
+    return { success: false, error: "Failed to get form" };
+  }
+}
+
+// Submit response
+export async function submitResponse(formId: string, values: any) {
+    try {
+        const form = await prisma.form.findUnique({
+            where: { id: formId },
+            include: { user: true }
+        });
+
+        if (!form) {
+            return { success: false, error: "Form not found" };
+        }
+
+        if (form.status !== 'published') {
+            return { success: false, error: "Form is not accepting responses" };
+        }
+
+        const user = form.user;
+        if (user.responsesUsed >= user.responseLimit) {
+            return { success: false, error: "This form has reached its response limit." };
+        }
+
+        // Transaction to ensure data integrity
+        await prisma.$transaction(async (tx) => {
+            // Create response
+            await tx.response.create({
+                data: {
+                    formId,
+                    values,
+                }
+            });
+
+            // Update form stats
+            await tx.form.update({
+                where: { id: formId },
+                data: {
+                    totalResponses: { increment: 1 },
+                    lastResponseAt: new Date(),
+                }
+            });
+
+            // Increment user usage
+            await tx.user.update({
+                where: { id: user.id },
+                data: {
+                    responsesUsed: { increment: 1 }
+                }
+            });
+        });
+
+        revalidatePath(`/dashboard/${formId}`);
+        return { success: true };
+
+    } catch (error) {
+        console.error("Submission failed:", error);
+        return { success: false, error: "Failed to submit response" };
+    }
+}

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 
@@ -20,6 +20,7 @@ import Image from "next/image";
 //  ------------------------------ Form Renderer Props --------------------------
 type FormRendererProps = FormSchema & {
     readOnly?: boolean; // If true, the form is rendered in a non-editable mode
+    isSubmitting?: boolean;
 };
 
 
@@ -60,6 +61,8 @@ const FieldRenderer = ({ field, design, readOnly }: { field: FormField; design?:
     };
 
     const commonProps = {
+        name: field.name,
+        required: field.required,
         disabled: readOnly,
         placeholder: field.placeholder || `Enter ${field.label.toLowerCase()}...`,
         className: cn("mt-1.5 w-full", getVariantClasses()),
@@ -81,9 +84,15 @@ const FieldRenderer = ({ field, design, readOnly }: { field: FormField; design?:
                 return <Textarea {...commonProps} rows={4} />;
 
             // radio
+            // Note: Radix RadioGroup supports name and required for native form submission
             case "radio":
                 return (
-                    <RadioGroup className="space-y-3 mt-3" disabled={readOnly}>
+                    <RadioGroup 
+                        name={field.name} 
+                        required={field.required} 
+                        className="space-y-3 mt-3" 
+                        disabled={readOnly}
+                    >
                         {(field.options || []).map((opt, i) => (
                             <div key={i} className="flex items-center space-x-3">
                                 <RadioGroupItem value={opt.value} id={`${field.name}-${i}`} />
@@ -100,12 +109,22 @@ const FieldRenderer = ({ field, design, readOnly }: { field: FormField; design?:
                 );
 
             // checkbox
+            // Note: Single checkbox usually doesn't need detailed array handling for 'options' unless it's a multi-select checkbox group.
+            // For now, assuming multiple checkboxes means "select multiple".
+            // Values are complex in native forms for multiple checkboxes with same name.
             case "checkbox":
                 return (
                     <div className="space-y-3 mt-3">
                         {(field.options || []).map((opt, i) => (
                             <div key={i} className="flex items-center space-x-3">
-                                <Checkbox id={`${field.name}-${i}`} disabled={readOnly} />
+                                <Checkbox 
+                                    id={`${field.name}-${i}`} 
+                                    name={field.name} 
+                                    // multiple checkbox required validation is tricky in native HTML, usually managed by custom JS or at least one checked. 
+                                    // Radix checkbox doesn't default to native required behavior easily for groups.
+                                    disabled={readOnly} 
+                                    value={opt.value}
+                                />
                                 <Label
                                     htmlFor={`${field.name}-${i}`}
                                     className="font-normal text-sm cursor-pointer transition-colors"
@@ -121,7 +140,7 @@ const FieldRenderer = ({ field, design, readOnly }: { field: FormField; design?:
             // Select
             case "select":
                 return (
-                    <Select disabled={readOnly}>
+                    <Select name={field.name} required={field.required} disabled={readOnly}>
                         <SelectTrigger
                             className={cn("mt-2 transition-all bg-white/50 border-zinc-300 hover:border-zinc-400", borderRadius)}
                             style={{ color: textColor, borderColor: 'rgb(212 212 216)' }}
@@ -202,7 +221,7 @@ const FieldRenderer = ({ field, design, readOnly }: { field: FormField; design?:
  * The main FormRenderer component.
  * It strictly follows the designSchema properties provided by the user.
  */
-export const FormRenderer = ({ title, description, brandLogo, logoAlignment, fieldSchema, designSchema, readOnly = false }: FormRendererProps) => {
+export const FormRenderer = ({ title, description, brandLogo, logoAlignment, fieldSchema, designSchema, readOnly = false, isSubmitting = false }: FormRendererProps) => {
     // Extract fields and design from schema
     const fields = fieldSchema?.fields || [];
     const design = designSchema;
@@ -283,7 +302,9 @@ export const FormRenderer = ({ title, description, brandLogo, logoAlignment, fie
                     {!readOnly && (
                         <div className="flex justify-between items-center pt-10 mt-8 border-t border-zinc-200/60">
                             <Button
+                                type="submit"
                                 variant={design?.button?.variant || 'default'}
+                                disabled={isSubmitting}
                                 className={cn(
                                     "px-8 py-6 text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all",
                                     borderRadius === 'full' ? 'rounded-full' : cardRoundedClass
@@ -294,11 +315,24 @@ export const FormRenderer = ({ title, description, brandLogo, logoAlignment, fie
                                     color: design?.button?.variant === 'outline' ? primaryColor : (design?.button?.variant === 'ghost' ? primaryColor : undefined)
                                 }}
                             >
-                                {design?.button?.text || "Submit"}
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Submitting...
+                                    </>
+                                ) : (
+                                    design?.button?.text || "Submit"
+                                )}
                             </Button>
                             <button
+                                type="button"
                                 className="text-sm font-medium hover:underline transition-colors underline-offset-4"
                                 style={{ color: textColor, opacity: 0.5 }}
+                                onClick={() => {
+                                    // Assuming a form reset is needed, but we don't have ref to form here. 
+                                    // This might need event bubbling or parent handling.
+                                    // For now, keep it simple or remove type if strict.
+                                }}
                             >
                                 Clear form
                             </button>

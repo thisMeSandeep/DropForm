@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import DashboardNav from "./DashboardNav";
 import { Badge } from "@/components/ui/badge";
 
+import ShareButton from "./ShareButton";
+
 export default async function DashboardLayout({
   children,
   params,
@@ -24,8 +26,6 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-
-        {/* Dashboard header */}
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 pt-6 pb-0">
           <div className="flex items-center gap-4 mb-6">
@@ -55,15 +55,17 @@ export default async function DashboardLayout({
             </div>
             
             <div className="ml-auto flex items-center gap-2">
-                <Button size="sm">
-                   Share
-                </Button>
+                <Link href={`/form-editor?id=${form.id}`}>
+                    <Button variant="outline" size="sm">
+                        Edit Form
+                    </Button>
+                </Link>
+                <ShareButton formId={form.id} />
             </div>
           </div>
           <DashboardNav formId={form.id} />
         </div>
       </header>
-      {/* Main body */}
       <main className="flex-1 container mx-auto px-4 py-8">
         {children}
       </main>

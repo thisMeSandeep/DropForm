@@ -42,7 +42,7 @@ export interface FormSchema {
   description: string | null;
   brandLogo: string | null;
   logoAlignment: "left" | "center" | "right";
-  status: "published" | "draft" | "paused" | "archived" | " closed";
+  status: "published" | "draft" | "paused" | "archived" | "closed";
   createdAt?: string;
   fieldSchema: {
     version: number;
