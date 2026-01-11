@@ -44,6 +44,31 @@ export async function getForm(id: string) {
   }
 }
 
+// Get all forms for user
+export async function getForms() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const forms = await prisma.form.findMany({
+      where: {
+        userId: session.user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return { success: true, data: forms };
+  } catch (error) {
+    console.error("Failed to fetch forms:", error);
+    return { success: false, error: "Failed to fetch forms" };
+  }
+}
 
 // Update form by id
 export async function updateForm(id: string, data: Prisma.FormUpdateInput) {

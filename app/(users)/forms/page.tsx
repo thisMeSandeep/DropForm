@@ -3,6 +3,9 @@ import FormHeader from "@/components/custom/FormHeader";
 import { auth } from "@/utils/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getForms } from "@/actions/form";
+import { FormPreviewCard } from "@/components/custom/FormPreviewThumbnail";
+import Link from "next/link";
 
 const Forms = async () => {
   // ... existing session logic ...
@@ -21,6 +24,7 @@ const Forms = async () => {
   }
 
   const user = session.user
+  const { data: forms } = await getForms();
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -42,12 +46,23 @@ const Forms = async () => {
           <TemplateList />
         </section>
 
-        {/* Saved Forms Section (Placeholder) */}
+        {/* Saved Forms Section */}
         <section>
           <h2 className="text-xl font-semibold text-zinc-900 tracking-tight mb-6">Recent forms</h2>
-          <div className="p-12 text-center border bg-white rounded-xl">
-            <p className="text-muted-foreground">No forms created yet.</p>
-          </div>
+
+          {forms && forms.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {forms.map((form) => (
+                <Link key={form.id} href={`/form-editor/${form.id}`}>
+                  <FormPreviewCard form={form as any} />
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="p-12 text-center border bg-white rounded-xl">
+              <p className="text-muted-foreground">No forms created yet.</p>
+            </div>
+          )}
         </section>
 
       </div>
