@@ -14,6 +14,11 @@ enum Role {
   USER
 }
 
+enum FormStatus {
+  draft
+  published
+}
+
 model User {
   id            String    @id
   name          String
@@ -88,9 +93,11 @@ model Form {
   title          String
   description    String?
   brandLogo      String?
+  logoAlignment  String     @default("left")
   fieldSchema    Json       @default("[]")
   designSchema   Json       @default("{}")
-  status         String     @default("draft")
+  status         FormStatus     @default(draft)
+  version        Int        @default(1)
   isArchived     Boolean    @default(false)
   totalResponses Int        @default(0)
   lastResponseAt DateTime?

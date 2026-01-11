@@ -1,0 +1,74 @@
+"use server";
+
+import { prisma } from "@/utils/prisma";
+import { Prisma } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+import { auth } from "@/utils/auth";
+import { headers } from "next/headers";
+
+// Create form
+export async function createForm(
+  data: Omit<Prisma.FormUncheckedCreateInput, "userId" | "status" | "version">
+) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const form = await prisma.form.create({
+      data: {
+        ...data,
+        userId: session.user.id,
+      },
+    });
+    return { success: true, data: form };
+  } catch (error) {
+    console.error("Failed to create form:", error);
+    return { success: false, error: "Failed to create form" };
+  }
+}
+
+// Get form by id
+export async function getForm(id: string) {
+  try {
+    const form = await prisma.form.findUnique({
+      where: { id },
+    });
+    return { success: true, data: form };
+  } catch (error) {
+    return { success: false, error: "Form not found" };
+  }
+}
+
+
+// Update form by id
+export async function updateForm(id: string, data: Prisma.FormUpdateInput) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const form = await prisma.form.update({
+      where: {
+        id,
+      },
+      data: {
+        ...data,
+      },
+    });
+
+    revalidatePath(`/form-editor/${id}`);
+    return { success: true, data: form };
+  } catch (error) {
+    console.error("Update failed:", error);
+    return { success: false, error: "Failed to update form" };
+  }
+}

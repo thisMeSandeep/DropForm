@@ -1,6 +1,6 @@
 "use client";
 
-import { File, LogOut, User } from "lucide-react";
+import { File, LogOut, User, Loader2 } from "lucide-react";
 import { signOut } from "@/utils/auth-client";
 import {
     DropdownMenu,
@@ -18,9 +18,10 @@ type FormHeaderType = {
     email: string;
     imageUrl?: string;
     formTitle: string;
+    status: "saved" | "saving" | "error" | "unsaved";
 };
 
-const Header = ({ name, email, imageUrl, formTitle }: FormHeaderType) => {
+const Header = ({ name, email, imageUrl, formTitle, status }: FormHeaderType) => {
     const router = useRouter();
 
     const getInitials = (fullName: string) => {
@@ -39,8 +40,18 @@ const Header = ({ name, email, imageUrl, formTitle }: FormHeaderType) => {
         <div className="flex items-center justify-between px-6 py-3 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-50">
             {/* Logo */}
             <div className="flex items-center gap-2">
-                <File className="size-10 text-gray-800"/>
-                <p className="text-xl text-gray-600">{formTitle}</p>
+                <File className="size-10 text-gray-800" />
+
+                {/* Sync status */}
+                <div>
+                    <p className="text-xl text-gray-600">{formTitle}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {status === "saving" && <Loader2 className="animate-spin h-4 w-4" />}
+                        {status === "saved" && "Saved to cloud"}
+                        {status === "error" && <span className="text-red-500">Error saving</span>}
+                        {status === "unsaved" && "Unsaved changes"}
+                    </p>
+                </div>
             </div>
 
 

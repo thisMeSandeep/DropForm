@@ -5,17 +5,27 @@ import FormPreview from '@/components/custom/FormPreview';
 import AiPromptPanel from '@/components/custom/AiPromptPanel';
 import Header from './Header';
 import { useSession } from "@/utils/auth-client";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
 import { useFormStore } from '@/store/useFormStore';
 import { LayoutPanelLeft, PanelsTopLeft, Sparkles } from "lucide-react";
+import { useFormAutoSave } from "@/hooks/useFormAutoSave";
+import { createForm, getForm } from "@/actions/form";
 
 type Pane = 'ai' | 'editor' | 'preview';
 
 const UserFormEditor = () => {
     const { data: session, isPending } = useSession();
-    const router = useRouter()
-    const form = useFormStore((state)=>state.form);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const formId = searchParams.get("id");
+
+    const form = useFormStore((state) => state.form);
+    const setForm = useFormStore((state) => state.setForm);
+
+    const { status } = useFormAutoSave(formId || "");
+    const initialized = useRef(false);
+
     const formTitle = form.title || "Untitled Form";
     const [activePane, setActivePane] = useState<Pane>('editor');
 
@@ -24,6 +34,51 @@ const UserFormEditor = () => {
             router.push("/login");
         }
     }, [session, isPending, router]);
+
+    // Initialize form: Fetch existing or Create new
+    useEffect(() => {
+        if (initialized.current || !session) return;
+
+        const initForm = async () => {
+            initialized.current = true;
+            if (formId) {
+                // Fetch existing form
+                const { success, data } = await getForm(formId);
+                if (success && data) {
+                    // Map DB data to FormSchema
+                    // NOTE: DB has fieldSchema/designSchema as Json.
+                    // We trust it matches our types or we might need validation/casting.
+                    const mappedForm: any = {
+                        title: data.title,
+                        description: data.description || "",
+                        brandLogo: data.brandLogo || "",
+                        logoAlignment: (data.logoAlignment as string) || "left",
+                        status: (data.status as any) || "draft",
+                        createdAt: data.createdAt.toISOString(),
+                        fieldSchema: data.fieldSchema,
+                        designSchema: data.designSchema,
+                    };
+                    setForm(mappedForm);
+                } else {
+                    // Helper: if not found, maybe redirect or show error?
+                    // For now, treat as new? No, creating new on bad ID is risky.
+                    // Just show error or redirect to clean editor.
+                }
+            } else {
+                // Create new form
+                const { success, data } = await createForm({
+                    title: "Untitled Form",
+                    fieldSchema: [], // Default empty
+                    designSchema: {}, // Default empty
+                });
+                if (success && data) {
+                    router.replace(`/form-editor?id=${data.id}`);
+                }
+            }
+        };
+
+        initForm();
+    }, [formId, session, setForm, router]);
 
     if (isPending) {
         return <div className="flex h-screen w-full items-center justify-center">Loading...</div>; // Or a better skeleton/spinner
@@ -40,7 +95,13 @@ const UserFormEditor = () => {
 
     return (
         <div className="min-h-screen bg-slate-50">
-            <Header name={user.name} email={user.email} imageUrl={user.image || undefined} formTitle={formTitle} />
+            <Header
+                name={user.name}
+                email={user.email}
+                imageUrl={user.image || undefined}
+                formTitle={formTitle}
+                status={status}
+            />
 
             <div className="h-[calc(100vh-80px)] w-full overflow-hidden px-4 py-3 xl:px-6">
                 <div className="mb-3 flex items-center gap-2 xl:hidden">
