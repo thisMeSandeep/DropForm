@@ -1,9 +1,9 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
-import { FormRenderer, FormField, FormDesign } from "./FormRenderer";
+import { FormField, FormDesign } from "@/types/formSchema";
 import { format } from "date-fns";
+import { FormRenderer } from "./FormRenderer";
 
 interface FormPreviewCardProps {
     form: {
@@ -54,26 +54,30 @@ export const FormPreviewCard = ({ form, onDelete }: FormPreviewCardProps) => {
                     <h3 className="text-[14px] font-semibold text-zinc-900 truncate pr-2 leading-tight">
                         {form.title}
                     </h3>
-                    <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-tight">Form</span>
-                        <span className="w-1 h-1 rounded-full bg-zinc-300" />
-                        <span className="text-[11px] text-zinc-500 font-medium">
-                            {format(creationDate, "MMM d, yyyy")}
-                        </span>
-                    </div>
+                    {form.createdAt && (
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-tight">Form</span>
+                            <span className="w-1 h-1 rounded-full bg-zinc-300" />
+                            <span className="text-[11px] text-zinc-500 font-medium">
+                                {format(new Date(form.createdAt), "MMM d, yyyy")}
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Quick Delete Action */}
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete?.();
-                    }}
-                    className="p-2 -mr-1 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 group/btn"
-                    title="Delete form"
-                >
-                    <Trash2 className="w-4 h-4 opacity-70 group-hover/btn:opacity-100" />
-                </button>
+                {onDelete && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete();
+                        }}
+                        className="p-2 -mr-1 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 group/btn"
+                        title="Delete form"
+                    >
+                        <Trash2 className="w-4 h-4 opacity-70 group-hover/btn:opacity-100" />
+                    </button>
+                )}
             </div>
         </div>
     );

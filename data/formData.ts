@@ -1,4 +1,4 @@
-import { FormField, FormDesign } from "@/components/custom/FormRenderer";
+import { FormField, FormDesign } from "@/types/formSchema";
 
 export interface FormTemplate {
   title: string;
