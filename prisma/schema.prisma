@@ -17,6 +17,9 @@ enum Role {
 enum FormStatus {
   draft
   published
+  paused
+  archived
+  closed
 }
 
 enum LogoAlignment {

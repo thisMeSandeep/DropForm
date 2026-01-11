@@ -209,3 +209,129 @@ export async function publishForm(id: string) {
     return { success: false, error: "Failed to publish form" };
   }
 }
+
+// Get form stats (Dashboard Overview)
+export async function getFormStats(id: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const form = await prisma.form.findUnique({
+      where: {
+        id,
+        userId: session.user.id,
+      },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        totalResponses: true,
+        lastResponseAt: true,
+        publishedAt: true,
+        createdAt: true,
+        responses: {
+          orderBy: {
+            createdAt: 'desc'
+          },
+          take: 5 
+        }
+      }
+    });
+
+    if (!form) {
+      return { success: false, error: "Form not found" };
+    }
+
+    return { success: true, data: form };
+  } catch (error) {
+    console.error("Failed to get form stats:", error);
+    return { success: false, error: "Failed to get form stats" };
+  }
+}
+
+// Get all responses (Responses Page)
+export async function getFormResponses(id: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const form = await prisma.form.findUnique({
+      where: {
+        id,
+        userId: session.user.id
+      },
+      select: {
+        fieldSchema: true,
+        responses: {
+          orderBy: {
+            createdAt: 'desc'
+          }
+        }
+      }
+    });
+
+    if (!form) {
+      return { success: false, error: "Form not found" };
+    }
+
+    return { 
+      success: true, 
+      data: {
+        responses: form.responses,
+        fieldSchema: form.fieldSchema 
+      }
+    };
+  } catch (error) {
+    console.error("Failed to get responses:", error);
+    return { success: false, error: "Failed to get responses" };
+  }
+}
+
+// Update form status (Settings Page)
+export async function updateFormStatus(id: string, status: "draft" | "published" | "paused" | "closed") {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const data: any = { status };
+    // If setting to published and it wasn't published before, set publishedAt
+    if (status === 'published') {
+        const currentForm = await prisma.form.findUnique({
+             where: { id },
+             select: { publishedAt: true }
+        });
+        if (currentForm && !currentForm.publishedAt) {
+            data.publishedAt = new Date();
+        }
+    }
+
+    const form = await prisma.form.update({
+      where: {
+        id,
+        userId: session.user.id,
+      },
+      data,
+    });
+    
+    revalidatePath(`/dashboard/${id}`);
+    return { success: true, data: form };
+  } catch (error) {
+    console.error("Failed to update status:", error);
+    return { success: false, error: "Failed to update status" };
+  }
+}

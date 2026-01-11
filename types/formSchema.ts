@@ -27,12 +27,12 @@ export interface FormDesign {
   button?: {
     text?: string;
     variant?:
-      | "default"
-      | "outline"
-      | "ghost"
-      | "link"
-      | "destructive"
-      | "secondary";
+    | "default"
+    | "outline"
+    | "ghost"
+    | "link"
+    | "destructive"
+    | "secondary";
   };
 }
 
@@ -42,7 +42,7 @@ export interface FormSchema {
   description: string | null;
   brandLogo: string | null;
   logoAlignment: "left" | "center" | "right";
-  status: "published" | "draft";
+  status: "published" | "draft" | "paused" | "archived" | " closed";
   createdAt?: string;
   fieldSchema: {
     version: number;
