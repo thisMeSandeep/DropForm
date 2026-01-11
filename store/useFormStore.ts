@@ -1,11 +1,12 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { FormField, FormDesign, FormSchema } from "@/types/formSchema";
 
 interface FormState {
   form: FormSchema;
   selectedFieldId: string | null;
 
-  // Actions
+  // Global Actions
   setForm: (schema: FormSchema) => void;
   updateGlobalSettings: (
     settings: Partial<
@@ -32,7 +33,7 @@ interface FormState {
   ) => void;
 }
 
-// Initial State (Moved from FormEditor.tsx)
+// Initial State
 const initialSchema: FormSchema = {
   title: "Frontend Developer Job Application",
   description: "Apply for the frontend developer role",
@@ -132,99 +133,110 @@ const initialSchema: FormSchema = {
   },
 };
 
-export const useFormStore = create<FormState>((set) => ({
-  form: initialSchema,
-  selectedFieldId: null,
+export const useFormStore = create<FormState>()(
+  persist(
+    (set) => ({
+      form: initialSchema,
+      selectedFieldId: null,
 
-  setForm: (schema) => set({ form: schema }),
+      setForm: (schema) => set({ form: schema }),
 
-  updateGlobalSettings: (settings) =>
-    set((state) => ({
-      form: { ...state.form, ...settings },
-    })),
+      updateGlobalSettings: (settings) =>
+        set((state) => ({
+          form: { ...state.form, ...settings },
+        })),
 
-  addField: (type) => {
-    const newField: FormField = {
-      name: `field_${crypto.randomUUID().slice(0, 8)}`,
-      type,
-      label: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
-      required: false,
-      options: ["select", "radio", "checkbox"].includes(type)
-        ? [{ label: "Option 1", value: "option_1" }]
-        : undefined,
-    };
-    set((state) => ({
-      form: {
-        ...state.form,
-        fieldSchema: {
-          ...state.form.fieldSchema,
-          fields: [...state.form.fieldSchema.fields, newField],
-        },
-      },
-      selectedFieldId: newField.name,
-    }));
-  },
-
-  updateField: (id, updates) =>
-    set((state) => ({
-      form: {
-        ...state.form,
-        fieldSchema: {
-          ...state.form.fieldSchema,
-          fields: state.form.fieldSchema.fields.map((f) =>
-            f.name === id ? { ...f, ...updates } : f
-          ),
-        },
-      },
-    })),
-
-  removeField: (id) =>
-    set((state) => {
-      const newFields = state.form.fieldSchema.fields.filter(
-        (f) => f.name !== id
-      );
-      return {
-        form: {
-          ...state.form,
-          fieldSchema: {
-            ...state.form.fieldSchema,
-            fields: newFields,
+      addField: (type) => {
+        const newField: FormField = {
+          name: `field_${crypto.randomUUID().slice(0, 8)}`,
+          type,
+          label: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+          required: false,
+          options: ["select", "radio", "checkbox"].includes(type)
+            ? [{ label: "Option 1", value: "option_1" }]
+            : undefined,
+        };
+        set((state) => ({
+          form: {
+            ...state.form,
+            fieldSchema: {
+              ...state.form.fieldSchema,
+              fields: [...state.form.fieldSchema.fields, newField],
+            },
           },
-        },
-        selectedFieldId:
-          state.selectedFieldId === id ? null : state.selectedFieldId,
-      };
+          selectedFieldId: newField.name,
+        }));
+      },
+
+      updateField: (id, updates) =>
+        set((state) => ({
+          form: {
+            ...state.form,
+            fieldSchema: {
+              ...state.form.fieldSchema,
+              fields: state.form.fieldSchema.fields.map((f) =>
+                f.name === id ? { ...f, ...updates } : f
+              ),
+            },
+          },
+        })),
+
+      removeField: (id) =>
+        set((state) => {
+          const newFields = state.form.fieldSchema.fields.filter(
+            (f) => f.name !== id
+          );
+          return {
+            form: {
+              ...state.form,
+              fieldSchema: {
+                ...state.form.fieldSchema,
+                fields: newFields,
+              },
+            },
+            selectedFieldId:
+              state.selectedFieldId === id ? null : state.selectedFieldId,
+          };
+        }),
+
+      setSelectedFieldId: (id) => set({ selectedFieldId: id }),
+
+      updateDesign: (updates) =>
+        set((state) => ({
+          form: {
+            ...state.form,
+            designSchema: { ...state.form.designSchema, ...updates },
+          },
+        })),
+
+      updateFieldStyles: (updates) =>
+        set((state) => ({
+          form: {
+            ...state.form,
+            designSchema: {
+              ...state.form.designSchema,
+              fieldStyles: {
+                ...state.form.designSchema.fieldStyles,
+                ...updates,
+              },
+            },
+          },
+        })),
+
+      updateButtonStyles: (updates) =>
+        set((state) => ({
+          form: {
+            ...state.form,
+            designSchema: {
+              ...state.form.designSchema,
+              button: { ...state.form.designSchema.button, ...updates },
+            },
+          },
+        })),
     }),
-
-  setSelectedFieldId: (id) => set({ selectedFieldId: id }),
-
-  updateDesign: (updates) =>
-    set((state) => ({
-      form: {
-        ...state.form,
-        designSchema: { ...state.form.designSchema, ...updates },
-      },
-    })),
-
-  updateFieldStyles: (updates) =>
-    set((state) => ({
-      form: {
-        ...state.form,
-        designSchema: {
-          ...state.form.designSchema,
-          fieldStyles: { ...state.form.designSchema.fieldStyles, ...updates },
-        },
-      },
-    })),
-
-  updateButtonStyles: (updates) =>
-    set((state) => ({
-      form: {
-        ...state.form,
-        designSchema: {
-          ...state.form.designSchema,
-          button: { ...state.form.designSchema.button, ...updates },
-        },
-      },
-    })),
-}));
+    {
+      name: "form-storage",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);

@@ -1,3 +1,5 @@
+
+//  Form field type 
 export interface FormField {
   name: string;
   type: string;
@@ -8,6 +10,8 @@ export interface FormField {
   placeholder?: string;
 }
 
+
+// Form design type
 export interface FormDesign {
   primaryColor?: string;
   backgroundColor?: string;
@@ -34,6 +38,7 @@ export interface FormDesign {
   };
 }
 
+//  Composed form schema type
 export interface FormSchema {
   title: string;
   description: string;

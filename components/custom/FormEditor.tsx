@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
     Select,
@@ -167,7 +166,7 @@ const FormEditor = () => {
                     </TabsTrigger>
                 </TabsList>
 
-                {/* Using a flex container with overflow-y-auto instead of ScrollArea for layout stability */}
+                {/* Using a flex container with overflow-y-auto*/}
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
                     <div className="p-4 space-y-6">
                         {activeTab === "build" && (
