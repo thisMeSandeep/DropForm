@@ -97,3 +97,28 @@ export async function updateForm(id: string, data: Prisma.FormUpdateInput) {
     return { success: false, error: "Failed to update form" };
   }
 }
+
+// Delete form
+export async function deleteForm(id: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    await prisma.form.delete({
+      where: {
+        id,
+        userId: session.user.id, // Ensure user owns the form
+      },
+    });
+    revalidatePath("/forms");
+    return { success: true };
+  } catch (error) {
+    console.error("Delete failed:", error);
+    return { success: false, error: "Failed to delete form" };
+  }
+}

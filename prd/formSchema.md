@@ -13,7 +13,9 @@
 
 
 
-### Ignore for now 
+### Future implementation
 
 - File upload 
 - Icon in fields
+- Allow user to archive forms
+- Allow user to halt talking responses  (halt in status)

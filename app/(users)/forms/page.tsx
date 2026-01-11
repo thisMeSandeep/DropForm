@@ -4,8 +4,7 @@ import { auth } from "@/utils/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getForms } from "@/actions/form";
-import { FormPreviewCard } from "@/components/custom/FormPreviewThumbnail";
-import Link from "next/link";
+import { FormCardWrapper } from "@/components/custom/FormCardWrapper";
 
 const Forms = async () => {
   // ... existing session logic ...
@@ -53,9 +52,7 @@ const Forms = async () => {
           {forms && forms.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {forms.map((form) => (
-                <Link key={form.id} href={`/form-editor/${form.id}`}>
-                  <FormPreviewCard form={form as any} />
-                </Link>
+                <FormCardWrapper key={form.id} form={form} />
               ))}
             </div>
           ) : (
