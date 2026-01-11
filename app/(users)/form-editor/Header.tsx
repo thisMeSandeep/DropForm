@@ -1,7 +1,6 @@
 "use client";
 
-import { Search, LogOut, User } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { File, LogOut, User } from "lucide-react";
 import { signOut } from "@/utils/auth-client";
 import {
     DropdownMenu,
@@ -17,10 +16,11 @@ import { useRouter } from "next/navigation";
 type FormHeaderType = {
     name: string;
     email: string;
-    imageUrl?: string ;
+    imageUrl?: string;
+    formTitle: string;
 };
 
-const FormHeader = ({ name, email, imageUrl }: FormHeaderType) => {
+const Header = ({ name, email, imageUrl, formTitle }: FormHeaderType) => {
     const router = useRouter();
 
     const getInitials = (fullName: string) => {
@@ -39,19 +39,10 @@ const FormHeader = ({ name, email, imageUrl }: FormHeaderType) => {
         <div className="flex items-center justify-between px-6 py-3 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-50">
             {/* Logo */}
             <div className="flex items-center gap-2">
-                <div className="text-xl font-bold bg-linear-to-tr from-primary to-gray-600 bg-clip-text text-transparent">
-                    Drop Form
-                </div>
+                <File />
+                <p>{formTitle}</p>
             </div>
 
-            {/* Search input */}
-            <div className="flex-1 max-w-md mx-8 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                    placeholder="Search forms..."
-                    className="pl-9 bg-muted/40 border-muted-foreground/20 focus-visible:bg-background transition-colors rounded-full"
-                />
-            </div>
 
             {/* User Profile */}
             <DropdownMenu>
@@ -87,4 +78,4 @@ const FormHeader = ({ name, email, imageUrl }: FormHeaderType) => {
     );
 };
 
-export default FormHeader;
+export default Header;
