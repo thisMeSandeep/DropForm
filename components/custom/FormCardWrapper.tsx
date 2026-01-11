@@ -16,9 +16,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { FormSchema } from "@/types/formSchema";
 
 interface FormCardWrapperProps {
-    form: any; // Using any to match existing usage in page.tsx, refine type if possible
+    form: FormSchema; // Using any to match existing usage in page.tsx, refine type if possible
 }
 
 export function FormCardWrapper({ form }: FormCardWrapperProps) {
@@ -35,7 +36,7 @@ export function FormCardWrapper({ form }: FormCardWrapperProps) {
 
         try {
             setIsDeleting(true);
-            const result = await deleteForm(form.id);
+            const result = await deleteForm(form.id ?? "");
 
             if (result.success) {
                 toast.success("Form deleted successfully");
@@ -44,6 +45,7 @@ export function FormCardWrapper({ form }: FormCardWrapperProps) {
                 toast.error(result.error || "Failed to delete form");
             }
         } catch (error) {
+            console.error("Delete error:", error);
             toast.error("An error occurred");
         } finally {
             setIsDeleting(false);

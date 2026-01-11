@@ -10,7 +10,6 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const Forms = async () => {
-  // ... existing session logic ...
   let session;
   try {
     session = await auth.api.getSession({
@@ -59,7 +58,7 @@ const Forms = async () => {
               ))}
             </div>
           ) : (
-            <div className="p-12 text-center border bg-white rounded-xl">
+            <div className="p-12 text-center border bg-white rounded-sm">
               <p className="text-muted-foreground">No forms created yet.</p>
             </div>
           )}

@@ -4,11 +4,11 @@ import { Suspense, useEffect, useEffectEvent, useState } from "react";
 import { useFormStore } from "@/store/useFormStore";
 import { FormRenderer } from "@/components/custom/FormRenderer";
 import { Button } from "@/components/ui/button";
-import {  ArrowLeft, Globe } from "lucide-react";
+import { ArrowLeft, Globe } from "lucide-react";
 import Link from "next/link";
-import { publishForm } from "@/actions/form"; // Import newly created action
+import { publishForm } from "@/actions/form";
 import { toast } from "sonner";
-import {  useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -25,9 +25,6 @@ const PreviewContent = () => {
     const { form, setForm } = useFormStore(); // Destructure setForm to update local state
     const [mounted, setMounted] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
-   
-
-
     const searchParams = useSearchParams();
     const formId = searchParams.get("id");
 
@@ -39,6 +36,8 @@ const PreviewContent = () => {
         onMount();
     }, []);
 
+
+    const router = useRouter();
 
     // Handle form publish
     const handlePublish = async (e: React.MouseEvent) => {
@@ -61,6 +60,7 @@ const PreviewContent = () => {
             if (result.success && result.data) {
                 toast.success("Form published successfully!");
                 setForm({ ...form, status: "published" });
+                router.replace(`/dashboard?id=${formId}`);
             } else {
                 toast.error(result.error || "Failed to publish form");
             }
@@ -127,12 +127,7 @@ const PreviewContent = () => {
             {/* Main Form Display */}
             <main className="flex-1 overflow-y-auto">
                 <FormRenderer
-                    title={form.title}
-                    description={form.description}
-                    brandLogo={form.brandLogo}
-                    logoAlignment={form.logoAlignment}
-                    fields={form.fieldSchema?.fields || []}
-                    design={form.designSchema}
+                    {...form}
                     readOnly={false}
                 />
             </main>

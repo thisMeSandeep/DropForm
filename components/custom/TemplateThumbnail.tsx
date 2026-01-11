@@ -1,22 +1,15 @@
 "use client";
 
-import { FormField, FormDesign } from "@/types/formSchema";
+import { FormSchema } from "@/types/formSchema";
 import { FormRenderer } from "./FormRenderer";
 
 interface TemplateThumbnailProps {
-    template: {
-        title: string;
-        description?: string;
-        brandLogo?: string;
-        logoAlignment?: 'left' | 'center' | 'right';
-        fieldSchema: { fields: FormField[] };
-        designSchema: FormDesign;
-    };
+    template: FormSchema;
 }
 
 export const TemplateThumbnail = ({ template }: TemplateThumbnailProps) => {
     return (
-        <div className="flex flex-col gap-3 group w-full max-w-[280px]">
+        <div className="flex flex-col gap-3 group w-full max-w-70">
             {/* Thumbnail Preview Area */}
             <div className="relative w-full aspect-4/3 bg-gray-50 border border-zinc-200 rounded-xl overflow-hidden group-hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-md ring-1 ring-black/5">
                 {/* Minified Form Content */}
@@ -28,12 +21,7 @@ export const TemplateThumbnail = ({ template }: TemplateThumbnailProps) => {
                     }}
                 >
                     <FormRenderer
-                        title={template.title}
-                        description={template.description}
-                        brandLogo={template.brandLogo}
-                        logoAlignment={template.logoAlignment}
-                        fields={template.fieldSchema?.fields || []}
-                        design={template.designSchema}
+                        {...template}
                         readOnly
                     />
                 </div>

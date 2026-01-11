@@ -39,11 +39,11 @@ export interface FormDesign {
 //  Composed form schema type
 export interface FormSchema {
   title: string;
-  description: string;
-  brandLogo: string;
+  description: string | null;
+  brandLogo: string | null;
   logoAlignment: "left" | "center" | "right";
   status: "published" | "draft";
-  createdAt: string;
+  createdAt?: string;
   fieldSchema: {
     version: number;
     fields: FormField[];

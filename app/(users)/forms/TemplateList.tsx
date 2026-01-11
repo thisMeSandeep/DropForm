@@ -10,7 +10,7 @@ const TemplateList = () => {
     const router = useRouter();
     const { setForm } = useFormStore();
 
-    const handleSelectTemplate = (template: any) => {
+    const handleSelectTemplate = (template:any) => {
         // Create a new schema from the template
         const newForm: FormSchema = {
             ...template,
@@ -23,9 +23,7 @@ const TemplateList = () => {
     };
 
     const handleCreateBlank = () => {
-        // Reset to blank (using the initial schema defined in store or a fresh object)
-        // Since we updated initialSchema in store to be blank, we can just reset or manually set blank
-        // Better to manually set to ensure fresh start
+        // Create fresh blank form schema
         const blankForm: FormSchema = {
             title: "Untitled Form",
             description: "",

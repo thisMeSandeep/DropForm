@@ -1,34 +1,38 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
-import { FormField, FormDesign } from "@/types/formSchema";
+import { FormSchema } from "@/types/formSchema";
 import { format } from "date-fns";
 import { FormRenderer } from "./FormRenderer";
 
 import Link from "next/link";
-// ... imports
+import { useRouter } from "next/navigation";
+
 
 interface FormPreviewCardProps {
-    form: {
-        id: string; // Added id
-        title: string;
-        description?: string;
-        brandLogo?: string;
-        logoAlignment?: 'left' | 'center' | 'right';
-        fieldSchema: { fields: FormField[] };
-        designSchema: FormDesign;
-        createdAt?: string | Date;
-    };
+    form: FormSchema;
     onDelete?: () => void;
 }
 
 export const FormPreviewThumbnail = ({ form, onDelete }: FormPreviewCardProps) => {
-    const creationDate = form.createdAt ? new Date(form.createdAt) : new Date();
+
+    const router = useRouter();
+
+    // Redirect  based on form status
+    const handleClick = () => {
+        if (form.status === "published") {
+            router.push(`/dashboard/${form.id}`);
+        }
+        if (form.status === "draft") {
+            router.push(`/form-editor?id=${form.id}`);
+        }
+    }
+
 
     return (
-        <div className="flex flex-col gap-3 group w-full max-w-[280px]">
+        <div className="flex flex-col gap-3 group w-full max-w-70">
             {/* Thumbnail Preview Area */}
-            <Link href={`/form-editor?id=${form.id}`} className="block">
+            <div onClick={handleClick} className="block">
                 <div className="relative w-full aspect-4/3 bg-gray-50 border border-zinc-200 rounded-xl overflow-hidden group-hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-md ring-1 ring-black/5">
                     {/* Minified Form Content */}
                     <div
@@ -39,12 +43,7 @@ export const FormPreviewThumbnail = ({ form, onDelete }: FormPreviewCardProps) =
                         }}
                     >
                         <FormRenderer
-                            title={form.title}
-                            description={form.description}
-                            brandLogo={form.brandLogo}
-                            logoAlignment={form.logoAlignment}
-                            fields={form.fieldSchema?.fields || []}
-                            design={form.designSchema}
+                            {...form}
                             readOnly
                         />
                     </div>
@@ -52,7 +51,7 @@ export const FormPreviewThumbnail = ({ form, onDelete }: FormPreviewCardProps) =
                     {/* Hover Overlay */}
                     <div className="absolute inset-0 bg-transparent group-hover:bg-black/2 transition-colors pointer-events-none" />
                 </div>
-            </Link>
+            </div>
 
             {/* Metadata and Actions */}
             <div className="flex items-start justify-between px-1.5 mt-0.5">

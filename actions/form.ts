@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/utils/auth";
 import { headers } from "next/headers";
+import { FormSchema, FormDesign, FormField } from "@/types/formSchema";
 
 // Create form
 export async function createForm(
@@ -25,7 +26,20 @@ export async function createForm(
         userId: session.user.id,
       },
     });
-    return { success: true, data: form };
+
+    const formattedForm: FormSchema = {
+      ...form,
+      logoAlignment: form.logoAlignment as "left" | "center" | "right",
+      status: form.status as "published" | "draft",
+      createdAt: form.createdAt.toISOString(),
+      fieldSchema: form.fieldSchema as unknown as {
+        version: number;
+        fields: FormField[];
+      },
+      designSchema: form.designSchema as unknown as FormDesign,
+    };
+
+    return { success: true, data: formattedForm };
   } catch (error) {
     console.error("Failed to create form:", error);
     return { success: false, error: "Failed to create form" };
@@ -38,8 +52,26 @@ export async function getForm(id: string) {
     const form = await prisma.form.findUnique({
       where: { id },
     });
-    return { success: true, data: form };
+
+    if (!form) {
+        return { success: false, error: "Form not found" };
+    }
+
+    const formattedForm: FormSchema = {
+      ...form,
+      logoAlignment: form.logoAlignment as "left" | "center" | "right",
+      status: form.status as "published" | "draft",
+      createdAt: form.createdAt.toISOString(),
+      fieldSchema: form.fieldSchema as unknown as {
+        version: number;
+        fields: FormField[];
+      },
+      designSchema: form.designSchema as unknown as FormDesign,
+    };
+
+    return { success: true, data: formattedForm };
   } catch (error) {
+    console.log(error)
     return { success: false, error: "Form not found" };
   }
 }
@@ -63,7 +95,20 @@ export async function getForms() {
         createdAt: "desc",
       },
     });
-    return { success: true, data: forms };
+
+    const formattedForms: FormSchema[] = forms.map((form) => ({
+      ...form,
+      logoAlignment: form.logoAlignment as "left" | "center" | "right",
+      status: form.status as "published" | "draft",
+      createdAt: form.createdAt.toISOString(),
+      fieldSchema: form.fieldSchema as unknown as {
+        version: number;
+        fields: FormField[];
+      },
+      designSchema: form.designSchema as unknown as FormDesign,
+    }));
+
+    return { success: true, data: formattedForms };
   } catch (error) {
     console.error("Failed to fetch forms:", error);
     return { success: false, error: "Failed to fetch forms" };
@@ -91,7 +136,20 @@ export async function updateForm(id: string, data: Prisma.FormUpdateInput) {
     });
 
     revalidatePath(`/form-editor/${id}`);
-    return { success: true, data: form };
+
+    const formattedForm: FormSchema = {
+      ...form,
+      logoAlignment: form.logoAlignment as "left" | "center" | "right",
+      status: form.status as "published" | "draft",
+      createdAt: form.createdAt.toISOString(),
+      fieldSchema: form.fieldSchema as unknown as {
+        version: number;
+        fields: FormField[];
+      },
+      designSchema: form.designSchema as unknown as FormDesign,
+    };
+
+    return { success: true, data: formattedForm };
   } catch (error) {
     console.error("Update failed:", error);
     return { success: false, error: "Failed to update form" };

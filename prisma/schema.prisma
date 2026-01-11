@@ -19,6 +19,12 @@ enum FormStatus {
   published
 }
 
+enum LogoAlignment {
+  left
+  center
+  right
+}
+
 model User {
   id            String    @id
   name          String
@@ -93,8 +99,8 @@ model Form {
   title          String
   description    String?
   brandLogo      String?
-  logoAlignment  String     @default("left")
-  fieldSchema    Json       @default("[]")
+  logoAlignment  LogoAlignment @default(left)
+  fieldSchema    Json       @default("{\"version\": 1, \"fields\": []}")
   designSchema   Json       @default("{}")
   status         FormStatus     @default(draft)
   version        Int        @default(1)

@@ -14,18 +14,13 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 
-import { FormField, FormDesign } from "@/types/formSchema";
+import { FormField, FormDesign, FormSchema } from "@/types/formSchema";
+import Image from "next/image";
 
 //  ------------------------------ Form Renderer Props --------------------------
-interface FormRendererProps {
-    title: string;
-    description?: string;
-    brandLogo?: string;
-    logoAlignment?: 'left' | 'center' | 'right';
-    fields: readonly FormField[];
-    design?: FormDesign;
-    readOnly?: boolean;
-}
+type FormRendererProps = FormSchema & {
+    readOnly?: boolean; // If true, the form is rendered in a non-editable mode
+};
 
 
 // ------------------------------ Field renderer--------------------------
@@ -34,7 +29,6 @@ interface FormRendererProps {
 
 const FieldRenderer = ({ field, design, readOnly }: { field: FormField; design?: FormDesign; readOnly?: boolean }) => {
     const textColor = design?.textColor || "#111827";
-    const primaryColor = design?.primaryColor || "#2563eb";
     const borderRadius = design?.borderRadius || 'md';
     const inputVariant = design?.fieldStyles?.inputVariant || 'outline';
     const labelPosition = design?.fieldStyles?.labelPosition || 'top';
@@ -169,7 +163,7 @@ const FieldRenderer = ({ field, design, readOnly }: { field: FormField; design?:
             default:
                 return (
                     <div className="h-12 w-full bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground italic">
-                        Input type "{field.type}" not implemented
+                        Input type &quot;{field.type}&quot; not implemented
                     </div>
                 );
         }
@@ -201,13 +195,18 @@ const FieldRenderer = ({ field, design, readOnly }: { field: FormField; design?:
 };
 
 
+
 // ---------------------------- Main renderer-------------------------
 
 /**
  * The main FormRenderer component.
  * It strictly follows the designSchema properties provided by the user.
  */
-export const FormRenderer = ({ title, description, brandLogo, logoAlignment, fields = [], design, readOnly = false }: FormRendererProps) => {
+export const FormRenderer = ({ title, description, brandLogo, logoAlignment, fieldSchema, designSchema, readOnly = false }: FormRendererProps) => {
+    // Extract fields and design from schema
+    const fields = fieldSchema?.fields || [];
+    const design = designSchema;
+
     // Design tokens from the schema
     const primaryColor = design?.primaryColor || "#2563eb";
     const backgroundColor = design?.backgroundColor || "#f8f9fa";
@@ -246,9 +245,11 @@ export const FormRenderer = ({ title, description, brandLogo, logoAlignment, fie
             {/* BRAND LOGO */}
             {logoUrl && (
                 <div className={cn("flex w-full max-w-2xl px-1 mb-8", logoClass)}>
-                    <img
+                    <Image
                         src={logoUrl}
                         alt="Brand Logo"
+                        width={150}
+                        height={40}
                         className="h-10 object-contain"
                     />
                 </div>
