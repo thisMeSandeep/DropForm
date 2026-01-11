@@ -25,12 +25,7 @@ const FormPreview = () => {
 
       <div className="flex-1 overflow-auto w-full h-full custom-scrollbar">
         <FormRenderer
-          title={form.title}
-          description={form.description}
-          brandLogo={form.brandLogo}
-          logoAlignment={form.logoAlignment}
-          fields={form.fieldSchema.fields}
-          design={form.designSchema}
+          {...form}
           readOnly={true}
         />
       </div>

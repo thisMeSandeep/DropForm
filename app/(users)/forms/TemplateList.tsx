@@ -10,7 +10,7 @@ const TemplateList = () => {
     const router = useRouter();
     const { setForm } = useFormStore();
 
-    const handleSelectTemplate = (template:any) => {
+    const handleSelectTemplate = (template: FormSchema) => {
         // Create a new schema from the template
         const newForm: FormSchema = {
             ...template,
@@ -87,9 +87,16 @@ const TemplateList = () => {
                 <div
                     key={idx}
                     className="cursor-pointer"
-                    onClick={() => handleSelectTemplate(template)}
+                    onClick={() => handleSelectTemplate({ ...template, description: template.description || null, brandLogo: template.brandLogo || null, logoAlignment: template.logoAlignment || "left" })}
                 >
-                    <TemplateThumbnail template={template} />
+                    <TemplateThumbnail template={{
+                        ...template,
+                        description: template.description || null,
+                        brandLogo: template.brandLogo || null,
+                        logoAlignment: template.logoAlignment || "left",
+                        id: undefined,
+                        createdAt: undefined
+                    }} />
                 </div>
             ))}
         </div>

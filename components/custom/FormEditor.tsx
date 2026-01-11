@@ -26,6 +26,7 @@ import { Trash2, Plus, GripVertical, Settings2, Palette, Code } from "lucide-rea
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
 import { useFormStore } from "@/store/useFormStore";
+import Image from "next/image";
 
 // --- Sub-Components ---
 const FieldConfigPanel = ({ field }: { field: FormField }) => {
@@ -181,7 +182,7 @@ const FormEditor = () => {
                                     />
                                     <Label className="mt-2 block">Description</Label>
                                     <Textarea
-                                        value={form.description}
+                                        value={form.description || ""}
                                         onChange={(e) => updateGlobalSettings({ description: e.target.value })}
                                         rows={2}
                                     />
@@ -215,7 +216,7 @@ const FormEditor = () => {
                                     </div>
 
                                     <div className="space-y-2">
-                                        {form.fieldSchema.fields.map((field, idx) => (
+                                        {form.fieldSchema.fields.map((field) => (
                                             <div key={field.name} className="space-y-2">
                                                 <div
                                                     className={cn(
@@ -422,7 +423,7 @@ const FormEditor = () => {
                                     <div className="flex items-center gap-4">
                                         {form.brandLogo ? (
                                             < div className="relative h-20 w-36 rounded-md border flex items-center justify-center bg-white overflow-hidden group">
-                                                <img src={form.brandLogo} alt="Logo" className="max-h-full max-w-full object-contain" />
+                                                <Image src={form.brandLogo} alt="Logo" fill className="max-h-full max-w-full object-contain" />
                                                 <button
                                                     onClick={() => updateGlobalSettings({ brandLogo: "" })}
                                                     className="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
