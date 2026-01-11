@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { Menu, X } from "lucide-react"
 import { BorderBeam } from "../ui/border-beam"
 import { useRouter } from "next/navigation"
+import { useSession } from "@/utils/auth-client"
 
 const navlinks = [
     { link: "Home", path: "/#home" },
@@ -33,6 +34,7 @@ const Navbar = () => {
 
 
     const router = useRouter();
+    const { data: session } = useSession();
 
     return (
         <div
@@ -64,10 +66,16 @@ const Navbar = () => {
 
                 {/* Desktop Action buttons */}
                 <div className="hidden md:flex items-center space-x-10">
-                    {/* Login  */}
-                    <Link href="/login" className="hover:text-gray-100/40 transition-colors duration-300">
-                        Login
-                    </Link>
+                    {/* Login / Dashboard */}
+                    {session ? (
+                        <Link href="/forms" className="hover:text-gray-100/40 transition-colors duration-300">
+                            Dashboard
+                        </Link>
+                    ) : (
+                        <Link href="/login" className="hover:text-gray-100/40 transition-colors duration-300">
+                            Login
+                        </Link>
+                    )}
                     {/* Free  */}
                     <button className="relative px-5 py-2 rounded-4xl border border-gray-100/20 hover:scale-110 transition-all duration-500 cursor-pointer">
                         Start free trial

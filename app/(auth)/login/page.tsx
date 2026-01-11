@@ -1,8 +1,9 @@
 "use client"
 
-import { signIn } from "@/utils/auth-client"
+import { signIn, useSession } from "@/utils/auth-client"
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
+import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import Image from "next/image"
@@ -28,6 +29,14 @@ type LoginFormData = z.infer<typeof loginSchema>
 const Login = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { data: session, isPending } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isPending && session) {
+      router.push("/forms")
+    }
+  }, [session, isPending, router])
 
   const {
     register,
