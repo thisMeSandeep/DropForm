@@ -122,3 +122,32 @@ export async function deleteForm(id: string) {
     return { success: false, error: "Failed to delete form" };
   }
 }
+
+// Publish form
+export async function publishForm(id: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const form = await prisma.form.update({
+      where: {
+        id,
+        userId: session.user.id,
+      },
+      data: {
+        status: "published",
+        publishedAt: new Date(),
+      },
+    });
+    revalidatePath("/form-editor");
+    return { success: true, data: form };
+  } catch (error) {
+    console.error("Publish failed:", error);
+    return { success: false, error: "Failed to publish form" };
+  }
+}

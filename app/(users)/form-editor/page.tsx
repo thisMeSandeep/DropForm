@@ -49,6 +49,7 @@ const UserFormEditor = () => {
                     // NOTE: DB has fieldSchema/designSchema as Json.
                     // We trust it matches our types or we might need validation/casting.
                     const mappedForm: any = {
+                        id: data.id,
                         title: data.title,
                         description: data.description || "",
                         brandLogo: data.brandLogo || "",

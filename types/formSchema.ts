@@ -1,5 +1,4 @@
-
-//  Form field type 
+//  Form field type
 export interface FormField {
   name: string;
   type: string;
@@ -9,7 +8,6 @@ export interface FormField {
   validation?: any;
   placeholder?: string;
 }
-
 
 // Form design type
 export interface FormDesign {
@@ -50,5 +48,6 @@ export interface FormSchema {
     version: number;
     fields: FormField[];
   };
+  id?: string;
   designSchema: FormDesign;
 }
